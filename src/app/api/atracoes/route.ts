@@ -4,6 +4,9 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { createAtracaoSchema, searchAtracaoSchema } from '@/lib/schemas'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Buscar atrações
 export async function GET(request: NextRequest) {
   try {

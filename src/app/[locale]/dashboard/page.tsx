@@ -1,8 +1,10 @@
 'use client'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useSession } from 'next-auth/react'
 import { 
   MapPin, 
   Calendar, 
@@ -52,31 +54,63 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
-  const { data: session } = useSession()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [userName, setUserName] = useState('')
 
   useEffect(() => {
-    if (session) {
-      fetchDashboardData()
-    }
-  }, [session])
+    checkAuthAndFetchData()
+  }, [])
 
-  const fetchDashboardData = async () => {
+  const checkAuthAndFetchData = async () => {
     try {
+      // Check authentication by trying to fetch dashboard data
       const response = await fetch('/api/dashboard/stats')
+      
+      if (response.status === 401) {
+        setIsAuthenticated(false)
+        setIsLoading(false)
+        return
+      }
+      
       if (response.ok) {
         const data = await response.json()
         setStats(data)
+        setIsAuthenticated(true)
+        
+        // Try to get user info from session API
+        try {
+          const sessionResponse = await fetch('/api/auth/session')
+          if (sessionResponse.ok) {
+            const sessionData = await sessionResponse.json()
+            setUserName(sessionData?.user?.name || 'Usuário')
+          }
+        } catch (error) {
+          console.log('Session fetch failed:', error)
+          setUserName('Usuário')
+        }
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
+      setIsAuthenticated(false)
     } finally {
       setIsLoading(false)
     }
   }
 
-  if (!session) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -97,24 +131,13 @@ export default function DashboardPage() {
     )
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando dashboard...</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Olá, {session.user.name}!
+            Olá, {userName}!
           </h1>
           <p className="text-gray-600">
             Bem-vindo ao seu dashboard. Aqui você pode gerenciar seus roteiros e acompanhar suas estatísticas.

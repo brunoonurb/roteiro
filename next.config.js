@@ -16,6 +16,12 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com', 'via.placeholder.com'],
   },
+  output: 'standalone',
+  trailingSlash: false,
+  // Disable static optimization for pages that use authentication
+  async generateStaticParams() {
+    return []
+  }
 };
 
 module.exports = withPWA(withNextIntl(nextConfig));
