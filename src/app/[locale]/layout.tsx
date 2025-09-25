@@ -5,7 +5,7 @@ import { Providers } from './providers'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { locales } from '@/i18n/request'
+import { routing } from '@/i18n/routing'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -81,7 +81,7 @@ export default async function RootLayout({
   params: { locale: string }
 }) {
   // Validate that the incoming `locale` parameter is valid
-  if (!locales.includes(locale as any)) notFound()
+  if (!routing.locales.includes(locale as any)) notFound()
 
   // Providing all messages to the client
   // side is the easiest way to get started

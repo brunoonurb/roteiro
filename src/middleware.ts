@@ -1,31 +1,7 @@
 import createMiddleware from 'next-intl/middleware'
-import { locales, defaultLocale } from './i18n/request'
+import { routing } from './i18n/routing'
 
-export default createMiddleware({
-  // A list of all locales that are supported
-  locales,
-
-  // Used when no locale matches
-  defaultLocale,
-
-  // Strategy for locale detection
-  localeDetection: true,
-
-  // Prefix for locale in URL
-  localePrefix: 'as-needed',
-
-  // Domains configuration for multi-domain setup (optional)
-  // domains: [
-  //   {
-  //     domain: 'roteiros.com.br',
-  //     defaultLocale: 'pt'
-  //   },
-  //   {
-  //     domain: 'roteiros.com',
-  //     defaultLocale: 'en'
-  //   }
-  // ]
-})
+export default createMiddleware(routing)
 
 export const config = {
   // Match only internationalized pathnames
@@ -39,6 +15,7 @@ export const config = {
 
     // Enable redirects that add missing locales
     // (e.g. `/pathnames` -> `/en/pathnames`)
-    '/((?!_next|_vercel|.*\\..*).*)'
+    // Exclude API routes, _next, _vercel, and files with extensions
+    '/((?!api|_next|_vercel|.*\\..*).*)'
   ]
 }
