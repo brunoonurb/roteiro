@@ -9,7 +9,7 @@ interface Avaliacao {
   id: string
   nota: number
   comentario: string
-  createdAt: string
+  criadoEm: string
   usuario: {
     name: string
     image?: string
@@ -351,7 +351,7 @@ export default function SistemaAvaliacoes({
                       ))}
                     </div>
                     <span className="text-sm text-gray-500">
-                      {new Date(avaliacao.createdAt).toLocaleDateString('pt-BR')}
+                      {new Date(avaliacao.criadoEm).toLocaleDateString('pt-BR')}
                     </span>
                   </div>
                   

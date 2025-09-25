@@ -16,7 +16,7 @@ interface Roteiro {
   titulo: string
   descricao?: string
   publico: boolean
-  createdAt: string
+  criadoEm: string
   usuario: {
     id: string
     name: string
@@ -24,6 +24,8 @@ interface Roteiro {
   }
   _count?: {
     ingressos: number
+    avaliacoes: number
+    comentarios: number
   }
 }
 
@@ -50,7 +52,8 @@ export default function RoteirosPage() {
 
       const response = await fetch(url)
       const data = await response.json()
-      setRoteiros(data)
+      // A API retorna { roteiros: [...], pagination: {...} }
+      setRoteiros(data.roteiros || [])
     } catch (error) {
       console.error('Erro ao buscar roteiros:', error)
     } finally {

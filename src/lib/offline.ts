@@ -10,7 +10,7 @@ interface RoteiroOffline extends DBSchema {
       dias: any[]
       publico: boolean
       usuarioId: string
-      createdAt: string
+      criadoEm: string
       updatedAt: string
     }
   }
@@ -24,7 +24,7 @@ interface RoteiroOffline extends DBSchema {
       preco?: number
       roteiroId: string
       usuarioId: string
-      createdAt: string
+      criadoEm: string
     }
   }
 }
@@ -51,7 +51,7 @@ export const saveRoteiroOffline = async (roteiro: any) => {
   const database = await initOfflineDB()
   await database.put('roteiros', {
     ...roteiro,
-    createdAt: roteiro.createdAt || new Date().toISOString(),
+    criadoEm: roteiro.criadoEm || new Date().toISOString(),
     updatedAt: new Date().toISOString()
   })
 }
@@ -70,7 +70,7 @@ export const saveIngressoOffline = async (ingresso: any) => {
   const database = await initOfflineDB()
   await database.put('ingressos', {
     ...ingresso,
-    createdAt: ingresso.createdAt || new Date().toISOString()
+    criadoEm: ingresso.criadoEm || new Date().toISOString()
   })
 }
 

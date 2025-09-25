@@ -2,81 +2,187 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Filter, MapPin, Star, Clock, DollarSign, Grid, List } from 'lucide-react'
-import BuscaAtracoes from '@/components/BuscaAtracoes'
-import { PlaceResult, getPlacesService } from '@/lib/places'
+import { Search, Filter, MapPin, Star, Clock, DollarSign, Grid, List, Globe, Users, Tag } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+
+// Tipos baseados no schema do banco
+interface Atracao {
+  id: string
+  nome: string
+  descricao: string
+  categoria: string
+  preco: number
+  moeda: string
+  latitude: number
+  longitude: number
+  endereco: string
+  parceiro: string
+  linkAfiliado?: string
+  duracaoEstimada: number
+  avaliacaoMedia: number
+  totalAvaliacoes: number
+  ativo: boolean
+  criadoEm: string
+  _count?: {
+    avaliacoes: number
+    ingressos: number
+  }
+}
+
+interface AtracaoResponse {
+  atracoes: Atracao[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    pages: number
+  }
+}
 
 export default function AtracoesPage() {
-  const [atracoes, setAtracoes] = useState<PlaceResult[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const t = useTranslations()
+  
+  const [atracoes, setAtracoes] = useState<Atracao[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalAtracoes, setTotalAtracoes] = useState(0)
+  
   const [filters, setFilters] = useState({
     categoria: '',
-    rating: 0,
-    priceLevel: 0,
-    openNow: false,
+    parceiro: '',
+    precoMin: '',
+    precoMax: '',
+    avaliacaoMin: '',
+    destino: ''
   })
-  const [searchQuery, setSearchQuery] = useState('')
-  const [location, setLocation] = useState<{ lat: number; lng: number } | undefined>()
 
-  // Get user location
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          })
-        },
-        (error) => {
-          console.log('Geolocation error:', error)
-          // Default to Paris
-          setLocation({ lat: 48.8566, lng: 2.3522 })
-        }
-      )
-    } else {
-      // Default to Paris
-      setLocation({ lat: 48.8566, lng: 2.3522 })
-    }
-  }, [])
+  // Opções para filtros
+  const categorias = [
+    { value: 'CULTURA', label: 'Cultura' },
+    { value: 'GASTRONOMIA', label: 'Gastronomia' },
+    { value: 'AVENTURA', label: 'Aventura' },
+    { value: 'RELAXAMENTO', label: 'Relaxamento' },
+    { value: 'VIDA_NOTURNA', label: 'Vida Noturna' },
+    { value: 'COMPRAS', label: 'Compras' },
+    { value: 'PARQUES', label: 'Parques' },
+    { value: 'RELIGIOSO', label: 'Religioso' }
+  ]
 
-  const searchAtracoes = async (query: string) => {
-    if (!query.trim() || !location) return
+  const parceiros = [
+    { value: 'GETYOURGUIDE', label: 'GetYourGuide' },
+    { value: 'CIVITATIS', label: 'Civitatis' },
+    { value: 'VIATOR', label: 'Viator' },
+    { value: 'TIQETS', label: 'Tiqets' },
+    { value: 'BOOKING', label: 'Booking.com' },
+    { value: 'AIRBNB', label: 'Airbnb' }
+  ]
 
+  // Buscar atrações
+  const fetchAtracoes = async (page = 1) => {
     setIsLoading(true)
     try {
-      const placesService = getPlacesService()
-      const results = await placesService.searchPlaces(query, location, 50000)
-      setAtracoes(results)
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '12'
+      })
+
+      // Adicionar filtros aos parâmetros
+      if (searchQuery.trim()) params.append('query', searchQuery.trim())
+      if (filters.categoria) params.append('categoria', filters.categoria)
+      if (filters.parceiro) params.append('parceiro', filters.parceiro)
+      if (filters.precoMin) params.append('precoMin', filters.precoMin)
+      if (filters.precoMax) params.append('precoMax', filters.precoMax)
+      if (filters.destino) params.append('query', filters.destino)
+
+      const response = await fetch(`/api/atracoes?${params.toString()}`)
+      const data: AtracaoResponse = await response.json()
+
+      if (response.ok) {
+        setAtracoes(data.atracoes || [])
+        setCurrentPage(data.pagination.page)
+        setTotalPages(data.pagination.pages)
+        setTotalAtracoes(data.pagination.total)
+      } else {
+        console.error('Erro ao buscar atrações:', data)
+        setAtracoes([])
+      }
     } catch (error) {
-      console.error('Error searching attractions:', error)
+      console.error('Erro ao buscar atrações:', error)
+      setAtracoes([])
     } finally {
       setIsLoading(false)
     }
   }
 
+  // Carregar atrações iniciais
+  useEffect(() => {
+    fetchAtracoes(1)
+  }, [])
+
+  // Buscar quando filtros mudarem
+  useEffect(() => {
+    if (currentPage === 1) {
+      fetchAtracoes(1)
+    } else {
+      setCurrentPage(1)
+      fetchAtracoes(1)
+    }
+  }, [searchQuery, filters])
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    searchAtracoes(searchQuery)
+    fetchAtracoes(1)
   }
 
-  const filteredAtracoes = atracoes.filter(atracao => {
-    if (filters.categoria && !atracao.types.includes(filters.categoria)) return false
-    if (filters.rating > 0 && (!atracao.rating || atracao.rating < filters.rating)) return false
-    if (filters.priceLevel > 0 && (!atracao.price_level || atracao.price_level < filters.priceLevel)) return false
-    if (filters.openNow && atracao.opening_hours && !atracao.opening_hours.open_now) return false
-    return true
-  })
-
-  const formatPriceLevel = (level?: number) => {
-    if (!level) return 'Preço não informado'
-    return '$'.repeat(level)
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }))
   }
 
-  const formatRating = (rating?: number) => {
-    if (!rating) return 'Sem avaliação'
-    return rating.toFixed(1)
+  const clearFilters = () => {
+    setFilters({
+      categoria: '',
+      parceiro: '',
+      precoMin: '',
+      precoMax: '',
+      avaliacaoMin: '',
+      destino: ''
+    })
+    setSearchQuery('')
+  }
+
+  const formatPrice = (price: number, currency: string) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: currency === 'EUR' ? 'EUR' : currency === 'GBP' ? 'GBP' : 'EUR'
+    }).format(price)
+  }
+
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) return `${minutes}min`
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`
+  }
+
+  const getDestinationFromAddress = (address: string) => {
+    // Extrair cidade do endereço
+    const parts = address.split(',')
+    return parts[parts.length - 1]?.trim() || address
+  }
+
+  const getParceiroBadgeColor = (parceiro: string) => {
+    const colors: Record<string, string> = {
+      'GETYOURGUIDE': 'bg-blue-100 text-blue-800',
+      'CIVITATIS': 'bg-green-100 text-green-800',
+      'VIATOR': 'bg-purple-100 text-purple-800',
+      'TIQETS': 'bg-orange-100 text-orange-800',
+      'BOOKING': 'bg-indigo-100 text-indigo-800',
+      'AIRBNB': 'bg-pink-100 text-pink-800'
+    }
+    return colors[parceiro] || 'bg-gray-100 text-gray-800'
   }
 
   return (
@@ -85,10 +191,10 @@ export default function AtracoesPage() {
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Descubra Atrações
+            Descubra Atrações na Europa
           </h1>
           <p className="text-gray-600">
-            Encontre as melhores atrações, restaurantes e pontos turísticos da Europa
+            Encontre as melhores experiências, museus, restaurantes e pontos turísticos com nossos parceiros
           </p>
         </div>
       </div>
@@ -105,7 +211,7 @@ export default function AtracoesPage() {
 
               {/* Search Form */}
               <form onSubmit={handleSearch} className="mb-6">
-                <div className="relative">
+                <div className="relative mb-3">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
                     type="text"
@@ -117,83 +223,111 @@ export default function AtracoesPage() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  disabled={isLoading}
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
-                  Buscar
+                  {isLoading ? 'Buscando...' : 'Buscar'}
                 </button>
               </form>
 
+              {/* Destination Filter */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  Destino
+                </label>
+                <input
+                  type="text"
+                  value={filters.destino}
+                  onChange={(e) => handleFilterChange('destino', e.target.value)}
+                  placeholder="Ex: Paris, Roma, Barcelona..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
               {/* Category Filter */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <Tag className="w-4 h-4" />
                   Categoria
                 </label>
                 <select
                   value={filters.categoria}
-                  onChange={(e) => setFilters(prev => ({ ...prev, categoria: e.target.value }))}
+                  onChange={(e) => handleFilterChange('categoria', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Todas as categorias</option>
-                  <option value="tourist_attraction">Atrações Turísticas</option>
-                  <option value="museum">Museus</option>
-                  <option value="restaurant">Restaurantes</option>
-                  <option value="park">Parques</option>
-                  <option value="shopping_mall">Compras</option>
-                  <option value="night_club">Vida Noturna</option>
+                  {categorias.map(cat => (
+                    <option key={cat.value} value={cat.value}>{cat.label}</option>
+                  ))}
                 </select>
+              </div>
+
+              {/* Partner Filter */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <Globe className="w-4 h-4" />
+                  Parceiro
+                </label>
+                <select
+                  value={filters.parceiro}
+                  onChange={(e) => handleFilterChange('parceiro', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Todos os parceiros</option>
+                  {parceiros.map(parceiro => (
+                    <option key={parceiro.value} value={parceiro.value}>{parceiro.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Price Range */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  Faixa de Preço (€)
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="number"
+                    value={filters.precoMin}
+                    onChange={(e) => handleFilterChange('precoMin', e.target.value)}
+                    placeholder="Min"
+                    min="0"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <input
+                    type="number"
+                    value={filters.precoMax}
+                    onChange={(e) => handleFilterChange('precoMax', e.target.value)}
+                    placeholder="Max"
+                    min="0"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
               </div>
 
               {/* Rating Filter */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <Star className="w-4 h-4" />
                   Avaliação mínima
                 </label>
                 <select
-                  value={filters.rating}
-                  onChange={(e) => setFilters(prev => ({ ...prev, rating: parseInt(e.target.value) }))}
+                  value={filters.avaliacaoMin}
+                  onChange={(e) => handleFilterChange('avaliacaoMin', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value={0}>Qualquer avaliação</option>
-                  <option value={3}>3+ estrelas</option>
-                  <option value={4}>4+ estrelas</option>
-                  <option value={4.5}>4.5+ estrelas</option>
+                  <option value="">Qualquer avaliação</option>
+                  <option value="3">3+ estrelas</option>
+                  <option value="4">4+ estrelas</option>
+                  <option value="4.5">4.5+ estrelas</option>
                 </select>
-              </div>
-
-              {/* Price Level Filter */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nível de preço
-                </label>
-                <select
-                  value={filters.priceLevel}
-                  onChange={(e) => setFilters(prev => ({ ...prev, priceLevel: parseInt(e.target.value) }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value={0}>Qualquer preço</option>
-                  <option value={1}>$ (Econômico)</option>
-                  <option value={2}>$$ (Moderado)</option>
-                  <option value={3}>$$$ (Caro)</option>
-                  <option value={4}>$$$$ (Muito caro)</option>
-                </select>
-              </div>
-
-              {/* Open Now Filter */}
-              <div className="mb-6">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={filters.openNow}
-                    onChange={(e) => setFilters(prev => ({ ...prev, openNow: e.target.checked }))}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Abertos agora</span>
-                </label>
               </div>
 
               {/* Clear Filters */}
               <button
-                onClick={() => setFilters({ categoria: '', rating: 0, priceLevel: 0, openNow: false })}
+                onClick={clearFilters}
                 className="w-full px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Limpar Filtros
@@ -203,12 +337,17 @@ export default function AtracoesPage() {
 
           {/* Main Content */}
           <div className="lg:col-span-3">
-            {/* View Mode Toggle */}
+            {/* View Mode Toggle and Results Count */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
                 <span className="text-sm text-gray-600">
-                  {filteredAtracoes.length} atrações encontradas
+                  {totalAtracoes} atrações encontradas
                 </span>
+                {currentPage > 1 && (
+                  <span className="text-sm text-gray-500">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                )}
               </div>
               
               <div className="flex items-center gap-2">
@@ -231,106 +370,147 @@ export default function AtracoesPage() {
             {isLoading ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-gray-600">Buscando atrações...</p>
+                <p className="text-gray-600">Carregando atrações...</p>
               </div>
-            ) : filteredAtracoes.length === 0 ? (
+            ) : atracoes.length === 0 ? (
               <div className="text-center py-12">
                 <MapPin className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
                   Nenhuma atração encontrada
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 mb-4">
                   Tente ajustar os filtros ou fazer uma nova busca
                 </p>
+                <button
+                  onClick={clearFilters}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Limpar Filtros
+                </button>
               </div>
             ) : (
-              <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' : 'space-y-4'}>
-                <AnimatePresence>
-                  {filteredAtracoes.map((atracao, index) => (
-                    <motion.div
-                      key={atracao.place_id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ delay: index * 0.1 }}
-                      className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow ${
-                        viewMode === 'list' ? 'flex gap-4 p-4' : 'p-4'
-                      }`}
-                    >
-                      {/* Image */}
-                      <div className={viewMode === 'list' ? 'w-32 h-32 flex-shrink-0' : 'w-full h-48 mb-4'}>
-                        {atracao.photos && atracao.photos.length > 0 ? (
-                          <img
-                            src={getPlacesService().getPhotoUrl(atracao.photos[0].photo_reference, viewMode === 'list' ? 200 : 400)}
-                            alt={atracao.name}
-                            className={`w-full h-full object-cover rounded-lg ${
-                              viewMode === 'list' ? 'w-32 h-32' : ''
-                            }`}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
-                            <MapPin className="w-8 h-8 text-gray-400" />
+              <>
+                <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' : 'space-y-4'}>
+                  <AnimatePresence>
+                    {atracoes.map((atracao, index) => (
+                      <motion.div
+                        key={atracao.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ delay: index * 0.1 }}
+                        className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow ${
+                          viewMode === 'list' ? 'flex gap-4 p-4' : 'overflow-hidden'
+                        }`}
+                      >
+                        {/* Image Placeholder */}
+                        <div className={viewMode === 'list' ? 'w-32 h-32 flex-shrink-0' : 'w-full h-48'}>
+                          <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                            <MapPin className="w-8 h-8 text-white" />
                           </div>
-                        )}
-                      </div>
+                        </div>
 
-                      {/* Content */}
-                      <div className={viewMode === 'list' ? 'flex-1' : ''}>
-                        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                          {atracao.name}
-                        </h3>
-                        
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                          {atracao.formatted_address}
-                        </p>
+                        {/* Content */}
+                        <div className={`${viewMode === 'list' ? 'flex-1' : 'p-4'}`}>
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-semibold text-gray-900 line-clamp-2 flex-1">
+                              {atracao.nome}
+                            </h3>
+                            <span className={`ml-2 px-2 py-1 text-xs rounded-full ${getParceiroBadgeColor(atracao.parceiro)}`}>
+                              {atracao.parceiro}
+                            </span>
+                          </div>
+                          
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                            {atracao.descricao}
+                          </p>
 
-                        <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                          {atracao.rating && (
+                          <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                            <MapPin className="w-4 h-4" />
+                            <span className="truncate">{getDestinationFromAddress(atracao.endereco)}</span>
+                          </div>
+
+                          <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
                             <div className="flex items-center gap-1">
                               <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                              <span>{formatRating(atracao.rating)}</span>
-                              {atracao.user_ratings_total && (
-                                <span>({atracao.user_ratings_total})</span>
-                              )}
+                              <span>{Number(atracao.avaliacaoMedia).toFixed(1)}</span>
+                              <span>({atracao.totalAvaliacoes})</span>
                             </div>
-                          )}
-                          
-                          {atracao.price_level && (
-                            <div className="flex items-center gap-1">
-                              <DollarSign className="w-4 h-4" />
-                              <span>{formatPriceLevel(atracao.price_level)}</span>
-                            </div>
-                          )}
-                          
-                          {atracao.opening_hours && (
+                            
                             <div className="flex items-center gap-1">
                               <Clock className="w-4 h-4" />
-                              <span className={atracao.opening_hours.open_now ? 'text-green-600' : 'text-red-600'}>
-                                {atracao.opening_hours.open_now ? 'Aberto' : 'Fechado'}
-                              </span>
+                              <span>{formatDuration(atracao.duracaoEstimada)}</span>
                             </div>
-                          )}
-                        </div>
+                          </div>
 
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {atracao.types.slice(0, 3).map((type) => (
-                            <span
-                              key={type}
-                              className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                            >
-                              {type.replace(/_/g, ' ')}
+                          <div className="flex items-center gap-1 mb-3">
+                            <span className={`px-2 py-1 text-xs rounded-full ${
+                              atracao.categoria === 'CULTURA' ? 'bg-purple-100 text-purple-800' :
+                              atracao.categoria === 'GASTRONOMIA' ? 'bg-orange-100 text-orange-800' :
+                              atracao.categoria === 'AVENTURA' ? 'bg-green-100 text-green-800' :
+                              'bg-blue-100 text-blue-800'
+                            }`}>
+                              {atracao.categoria.replace('_', ' ')}
                             </span>
-                          ))}
-                        </div>
+                          </div>
 
-                        <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
-                          Ver Detalhes
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-bold text-gray-900">
+                              {formatPrice(atracao.preco, atracao.moeda)}
+                            </span>
+                            
+                            <button 
+                              onClick={() => atracao.linkAfiliado && window.open(atracao.linkAfiliado, '_blank')}
+                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                            >
+                              Ver Detalhes
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-2 mt-8">
+                    <button
+                      onClick={() => fetchAtracoes(currentPage - 1)}
+                      disabled={currentPage === 1 || isLoading}
+                      className="px-3 py-2 text-gray-500 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Anterior
+                    </button>
+                    
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const page = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => fetchAtracoes(page)}
+                          disabled={isLoading}
+                          className={`px-3 py-2 border rounded-lg ${
+                            page === currentPage
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'text-gray-500 border-gray-300 hover:bg-gray-50'
+                          } disabled:opacity-50`}
+                        >
+                          {page}
                         </button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
+                      )
+                    })}
+                    
+                    <button
+                      onClick={() => fetchAtracoes(currentPage + 1)}
+                      disabled={currentPage === totalPages || isLoading}
+                      className="px-3 py-2 text-gray-500 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Próxima
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

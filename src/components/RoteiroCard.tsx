@@ -13,7 +13,7 @@ interface RoteiroCardProps {
     descricao?: string
     dias?: any[]
     publico: boolean
-    createdAt: string
+    criadoEm: string
     usuario: {
       id: string
       name: string
@@ -121,7 +121,7 @@ export default function RoteiroCard({
           <div>
             <p className="text-sm text-gray-600">por {roteiro.usuario.name}</p>
             <p className="text-xs text-gray-500">
-              {new Date(roteiro.createdAt).toLocaleDateString('pt-BR')}
+              {new Date(roteiro.criadoEm).toLocaleDateString('pt-BR')}
             </p>
           </div>
         </div>

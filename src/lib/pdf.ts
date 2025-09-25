@@ -22,7 +22,7 @@ interface RoteiroPDF {
   usuario: {
     name: string
   }
-  createdAt: string
+  criadoEm: string
 }
 
 export const generateRoteiroPDF = (roteiro: RoteiroPDF) => {
@@ -82,7 +82,7 @@ export const generateRoteiroPDF = (roteiro: RoteiroPDF) => {
   doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
   doc.text(`Criado por: ${roteiro.usuario.name}`, 15, yPosition)
   yPosition += 5
-  doc.text(`Data: ${new Date(roteiro.createdAt).toLocaleDateString('pt-BR')}`, 15, yPosition)
+  doc.text(`Data: ${new Date(roteiro.criadoEm).toLocaleDateString('pt-BR')}`, 15, yPosition)
   yPosition += 5
   doc.text(`Total de dias: ${roteiro.dias.length}`, 15, yPosition)
   yPosition += 15

@@ -4,7 +4,7 @@ CREATE TABLE "users" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "image" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
@@ -17,7 +17,7 @@ CREATE TABLE "roteiros" (
     "descricao" TEXT,
     "dias" JSONB NOT NULL,
     "publico" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "usuarioId" TEXT NOT NULL,
 
@@ -38,7 +38,7 @@ CREATE TABLE "atracoes" (
     "preco" DOUBLE PRECISION,
     "duracao" INTEGER,
     "imagem" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "atracoes_pkey" PRIMARY KEY ("id")
@@ -49,7 +49,7 @@ CREATE TABLE "avaliacoes" (
     "id" TEXT NOT NULL,
     "nota" INTEGER NOT NULL,
     "comentario" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "atracaoId" TEXT NOT NULL,
     "usuarioId" TEXT NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE "ingressos" (
     "data" TIMESTAMP(3) NOT NULL,
     "atracao" TEXT,
     "preco" DOUBLE PRECISION,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "roteiroId" TEXT NOT NULL,
     "usuarioId" TEXT NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE "consultorias" (
     "orcamento" DOUBLE PRECISION,
     "status" TEXT NOT NULL DEFAULT 'pendente',
     "valor" DOUBLE PRECISION,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "usuarioId" TEXT NOT NULL,
 

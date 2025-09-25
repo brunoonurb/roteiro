@@ -15,7 +15,7 @@ interface Ingresso {
     id: string
     titulo: string
   }
-  createdAt: string
+  criadoEm: string
 }
 
 interface IngressoCardProps {
