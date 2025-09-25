@@ -1,0 +1,247 @@
+{
+  "home": {
+    "title": "Planeje sua Viagem à Europa com Roteiros Personalizados",
+    "subtitle": "Crie, personalize e compartilhe roteiros com dicas exclusivas e reservas fáceis",
+    "cta": "Comece Agora - Grátis",
+    "learnMore": "Saiba Mais",
+    "features": {
+      "free": "Sem custo inicial",
+      "maps": "Integração com mapas",
+      "offline": "Funciona offline"
+    }
+  },
+  "navigation": {
+    "roteiros": "Roteiros",
+    "atracoes": "Atrações",
+    "consultoria": "Consultoria",
+    "dashboard": "Dashboard",
+    "login": "Entrar",
+    "logout": "Sair"
+  },
+  "beneficios": {
+    "title": "Por que escolher o RoteirosApp?",
+    "subtitle": "Tudo que você precisa para planejar a viagem perfeita em uma única plataforma",
+    "personalizacao": {
+      "title": "Personalização Completa",
+      "description": "Crie roteiros únicos arrastando e soltando atrações, com horários personalizados e categorias específicas."
+    },
+    "avaliacoes": {
+      "title": "Avaliações por Atração",
+      "description": "Veja avaliações detalhadas de outros viajantes e contribua com suas próprias experiências em cada atração."
+    },
+    "mapas": {
+      "title": "Integração com Mapas",
+      "description": "Visualize suas atrações no mapa, calcule distâncias e tempos de deslocamento entre os pontos do roteiro."
+    },
+    "reservas": {
+      "title": "Reservas Integradas",
+      "description": "Acesse diretamente links de parceiros como Civitatis, GetYourGuide, Viator e Tiqets para reservar atividades."
+    },
+    "offline": {
+      "title": "Funciona Offline",
+      "description": "Acesse seus roteiros mesmo sem internet. Exporte como PDF e adicione ingressos à carteira digital."
+    },
+    "compartilhamento": {
+      "title": "Compartilhamento Social",
+      "description": "Compartilhe seus roteiros com amigos via WhatsApp, Facebook, Instagram ou link direto."
+    }
+  },
+  "depoimentos": {
+    "title": "O que nossos usuários dizem",
+    "subtitle": "Histórias reais de viajantes que transformaram suas experiências"
+  },
+  "formulario": {
+    "title": "Quer testar antes de viajar?",
+    "subtitle": "Deixe seus dados e receba dicas personalizadas para sua próxima viagem",
+    "nome": "Nome completo",
+    "email": "Email",
+    "destino": "Destino preferido",
+    "submit": "Quero Testar!",
+    "submitting": "Enviando...",
+    "success": {
+      "title": "Obrigado pelo seu interesse!",
+      "message": "Enviamos um email de confirmação para {email}. Em breve entraremos em contato com dicas personalizadas para sua viagem a {destino}.",
+      "another": "Enviar outro interesse"
+    },
+    "privacy": "Não compartilhamos seus dados com terceiros. Você pode cancelar a qualquer momento."
+  },
+  "roteiros": {
+    "title": "Descubra Roteiros Incríveis",
+    "subtitle": "Explore roteiros criados pela comunidade ou crie o seu próprio",
+    "filters": {
+      "all": "Todos",
+      "public": "Públicos",
+      "my": "Meus Roteiros"
+    },
+    "create": "Criar Roteiro",
+    "view": "Ver Roteiro",
+    "copy": "Copiar",
+    "edit": "Editar",
+    "delete": "Deletar",
+    "empty": {
+      "title": "Nenhum roteiro encontrado",
+      "message": "Você ainda não criou nenhum roteiro.",
+      "messagePublic": "Ainda não há roteiros disponíveis nesta categoria.",
+      "createFirst": "Criar Primeiro Roteiro"
+    }
+  },
+  "criarRoteiro": {
+    "title": "Criar Novo Roteiro",
+    "subtitle": "Planeje sua viagem perfeita com atrações, horários e dicas personalizadas",
+    "basicInfo": "Informações Básicas",
+    "roteiroTitle": "Título do Roteiro",
+    "description": "Descrição",
+    "public": "Tornar roteiro público (outros usuários poderão copiá-lo)",
+    "days": "Dias do Roteiro",
+    "addDay": "Adicionar Dia",
+    "day": "Dia {number}",
+    "addAtracao": "Adicionar Atração:",
+    "dayAtracoes": "Atrações do Dia ({count})",
+    "noAtracoes": "Nenhuma atração adicionada ainda",
+    "cancel": "Cancelar",
+    "save": "Criar Roteiro",
+    "update": "Atualizar Roteiro",
+    "saving": "Salvando...",
+    "placeholders": {
+      "title": "Ex: 5 dias em Paris - Roteiro Completo",
+      "description": "Descreva seu roteiro, incluindo dicas especiais..."
+    }
+  },
+  "categorias": {
+    "cultura": "Cultura",
+    "gastronomia": "Gastronomia",
+    "parques": "Parques",
+    "compras": "Compras",
+    "entretenimento": "Entretenimento",
+    "religioso": "Religioso"
+  },
+  "mapa": {
+    "title": "Mapa do Roteiro",
+    "atracoesWithLocation": "{count} atrações com localização",
+    "legenda": "Legenda:",
+    "notAvailable": "Mapa não disponível",
+    "configureApi": "Configure a chave da API do Google Maps"
+  },
+  "visualizacao": {
+    "lista": "Lista",
+    "mapa": "Mapa",
+    "dia": "Dia {number}",
+    "atracoes": "{count} atração",
+    "atracoesPlural": "{count} atrações",
+    "categoria": "Categoria: {categoria}",
+    "horario": "Horário: {horario}",
+    "duracao": "Duração: {duracao} min",
+    "preco": "€{preco}",
+    "reservar": "Reservar",
+    "endereco": "Endereço: {endereco}",
+    "noAtracoes": "Nenhuma atração adicionada"
+  },
+  "offline": {
+    "online": "Online",
+    "offline": "Offline",
+    "connectionRestored": "Conexão Restaurada",
+    "dataSynced": "Seus dados foram sincronizados",
+    "noConnection": "Sem Conexão",
+    "limitedFeatures": "Algumas funcionalidades podem estar limitadas",
+    "offlineMode": "Modo Offline Ativo",
+    "offlineMessage": "Seus roteiros estão sendo salvos localmente. Eles serão sincronizados quando a conexão for restaurada."
+  },
+  "dashboard": {
+    "title": "Meu Dashboard",
+    "subtitle": "Gerencie seus roteiros e acompanhe suas estatísticas",
+    "stats": {
+      "roteiros": "Roteiros",
+      "atracoes": "Atrações",
+      "visualizacoes": "Visualizações",
+      "avaliacoes": "Avaliações",
+      "ingressos": "Ingressos"
+    },
+    "recentRoteiros": "Roteiros Recentes",
+    "viewAll": "Ver Todos",
+    "noRoteiros": "Nenhum roteiro criado ainda",
+    "createFirst": "Criar Primeiro Roteiro"
+  },
+  "auth": {
+    "signIn": "Entrar",
+    "signOut": "Sair",
+    "signUp": "Cadastrar",
+    "welcome": "Bem-vindo(a)",
+    "signInWith": "Entrar com {provider}",
+    "signInGoogle": "Entrar com Google",
+    "signInFacebook": "Entrar com Facebook",
+    "signInApple": "Entrar com Apple"
+  },
+  "forms": {
+    "required": "Campo obrigatório",
+    "email": "Email inválido",
+    "minLength": "Mínimo de {min} caracteres",
+    "maxLength": "Máximo de {max} caracteres",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Deletar",
+    "edit": "Editar",
+    "create": "Criar",
+    "update": "Atualizar",
+    "loading": "Carregando...",
+    "saving": "Salvando...",
+    "success": "Sucesso!",
+    "error": "Erro",
+    "tryAgain": "Tentar novamente"
+  },
+  "atracoes": {
+    "title": "Atrações",
+    "search": "Buscar atrações...",
+    "filters": "Filtros",
+    "category": "Categoria",
+    "partner": "Parceiro",
+    "price": "Preço",
+    "location": "Localização",
+    "results": "{count} atrações encontradas",
+    "noResults": "Nenhuma atração encontrada",
+    "rating": "Avaliação",
+    "duration": "Duração",
+    "bookNow": "Reservar Agora"
+  },
+  "consultoria": {
+    "title": "Consultoria Personalizada",
+    "subtitle": "Deixe nossos especialistas criarem o roteiro perfeito para você",
+    "plans": {
+      "basic": "Básico",
+      "premium": "Premium",
+      "vip": "VIP"
+    },
+    "form": {
+      "destination": "Destino",
+      "startDate": "Data de Início",
+      "endDate": "Data de Fim",
+      "budget": "Orçamento",
+      "preferences": "Preferências",
+      "submit": "Solicitar Consultoria"
+    }
+  },
+  "premium": {
+    "title": "Torne-se Premium",
+    "subtitle": "Desbloqueie recursos exclusivos",
+    "features": {
+      "unlimitedRoteiros": "Roteiros ilimitados",
+      "prioritySupport": "Suporte prioritário",
+      "advancedExports": "Exportação avançada",
+      "premiumTemplates": "Templates premium"
+    },
+    "price": "R$ 19,90/mês",
+    "upgrade": "Fazer Upgrade"
+  },
+  "footer": {
+    "description": "A plataforma completa para criar, personalizar e compartilhar roteiros de viagem com integração de mapas e reservas.",
+    "quickLinks": "Links Rápidos",
+    "partners": "Nossos Parceiros",
+    "support": "Suporte",
+    "about": "Sobre Nós",
+    "help": "Central de Ajuda",
+    "contact": "Contato",
+    "terms": "Termos de Uso",
+    "privacy": "Política de Privacidade",
+    "copyright": "© 2024 RoteirosApp. Todos os direitos reservados.",
+    "madeWith": "Feito com ❤️ para viajantes apaixonados"
+  }
+}

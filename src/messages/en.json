@@ -1,0 +1,247 @@
+{
+  "home": {
+    "title": "Plan your Trip to Europe with Personalized Itineraries",
+    "subtitle": "Create, customize and share itineraries with exclusive tips and easy bookings",
+    "cta": "Get Started - Free",
+    "learnMore": "Learn More",
+    "features": {
+      "free": "No initial cost",
+      "maps": "Maps integration",
+      "offline": "Works offline"
+    }
+  },
+  "navigation": {
+    "roteiros": "Itineraries",
+    "atracoes": "Attractions",
+    "consultoria": "Consulting",
+    "dashboard": "Dashboard",
+    "login": "Sign In",
+    "logout": "Sign Out"
+  },
+  "beneficios": {
+    "title": "Why choose RoteirosApp?",
+    "subtitle": "Everything you need to plan the perfect trip in one platform",
+    "personalizacao": {
+      "title": "Complete Customization",
+      "description": "Create unique itineraries by dragging and dropping attractions, with custom schedules and specific categories."
+    },
+    "avaliacoes": {
+      "title": "Reviews by Attraction",
+      "description": "See detailed reviews from other travelers and contribute with your own experiences at each attraction."
+    },
+    "mapas": {
+      "title": "Maps Integration",
+      "description": "View your attractions on the map, calculate distances and travel times between itinerary points."
+    },
+    "reservas": {
+      "title": "Integrated Bookings",
+      "description": "Access direct links from partners like Civitatis, GetYourGuide, Viator and Tiqets to book activities."
+    },
+    "offline": {
+      "title": "Works Offline",
+      "description": "Access your itineraries even without internet. Export as PDF and add tickets to digital wallet."
+    },
+    "compartilhamento": {
+      "title": "Social Sharing",
+      "description": "Share your itineraries with friends via WhatsApp, Facebook, Instagram or direct link."
+    }
+  },
+  "depoimentos": {
+    "title": "What our users say",
+    "subtitle": "Real stories from travelers who transformed their experiences"
+  },
+  "formulario": {
+    "title": "Want to test before traveling?",
+    "subtitle": "Leave your details and receive personalized tips for your next trip",
+    "nome": "Full name",
+    "email": "Email",
+    "destino": "Preferred destination",
+    "submit": "I Want to Test!",
+    "submitting": "Submitting...",
+    "success": {
+      "title": "Thank you for your interest!",
+      "message": "We sent a confirmation email to {email}. We'll soon contact you with personalized tips for your trip to {destino}.",
+      "another": "Submit another interest"
+    },
+    "privacy": "We don't share your data with third parties. You can cancel anytime."
+  },
+  "roteiros": {
+    "title": "Discover Amazing Itineraries",
+    "subtitle": "Explore itineraries created by the community or create your own",
+    "filters": {
+      "all": "All",
+      "public": "Public",
+      "my": "My Itineraries"
+    },
+    "create": "Create Itinerary",
+    "view": "View Itinerary",
+    "copy": "Copy",
+    "edit": "Edit",
+    "delete": "Delete",
+    "empty": {
+      "title": "No itineraries found",
+      "message": "You haven't created any itineraries yet.",
+      "messagePublic": "There are no itineraries available in this category yet.",
+      "createFirst": "Create First Itinerary"
+    }
+  },
+  "criarRoteiro": {
+    "title": "Create New Itinerary",
+    "subtitle": "Plan your perfect trip with attractions, schedules and personalized tips",
+    "basicInfo": "Basic Information",
+    "roteiroTitle": "Itinerary Title",
+    "description": "Description",
+    "public": "Make itinerary public (other users will be able to copy it)",
+    "days": "Itinerary Days",
+    "addDay": "Add Day",
+    "day": "Day {number}",
+    "addAtracao": "Add Attraction:",
+    "dayAtracoes": "Day Attractions ({count})",
+    "noAtracoes": "No attractions added yet",
+    "cancel": "Cancel",
+    "save": "Create Itinerary",
+    "update": "Update Itinerary",
+    "saving": "Saving...",
+    "placeholders": {
+      "title": "Ex: 5 days in Paris - Complete Itinerary",
+      "description": "Describe your itinerary, including special tips..."
+    }
+  },
+  "categorias": {
+    "cultura": "Culture",
+    "gastronomia": "Gastronomy",
+    "parques": "Parks",
+    "compras": "Shopping",
+    "entretenimento": "Entertainment",
+    "religioso": "Religious"
+  },
+  "mapa": {
+    "title": "Itinerary Map",
+    "atracoesWithLocation": "{count} attractions with location",
+    "legenda": "Legend:",
+    "notAvailable": "Map not available",
+    "configureApi": "Configure Google Maps API key"
+  },
+  "visualizacao": {
+    "lista": "List",
+    "mapa": "Map",
+    "dia": "Day {number}",
+    "atracoes": "{count} attraction",
+    "atracoesPlural": "{count} attractions",
+    "categoria": "Category: {categoria}",
+    "horario": "Time: {horario}",
+    "duracao": "Duration: {duracao} min",
+    "preco": "€{preco}",
+    "reservar": "Book",
+    "endereco": "Address: {endereco}",
+    "noAtracoes": "No attractions added"
+  },
+  "offline": {
+    "online": "Online",
+    "offline": "Offline",
+    "connectionRestored": "Connection Restored",
+    "dataSynced": "Your data has been synced",
+    "noConnection": "No Connection",
+    "limitedFeatures": "Some features may be limited",
+    "offlineMode": "Offline Mode Active",
+    "offlineMessage": "Your itineraries are being saved locally. They will be synced when connection is restored."
+  },
+  "dashboard": {
+    "title": "My Dashboard",
+    "subtitle": "Manage your itineraries and track your statistics",
+    "stats": {
+      "roteiros": "Itineraries",
+      "atracoes": "Attractions",
+      "visualizacoes": "Views",
+      "avaliacoes": "Reviews",
+      "ingressos": "Tickets"
+    },
+    "recentRoteiros": "Recent Itineraries",
+    "viewAll": "View All",
+    "noRoteiros": "No itineraries created yet",
+    "createFirst": "Create First Itinerary"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signUp": "Sign Up",
+    "welcome": "Welcome",
+    "signInWith": "Sign in with {provider}",
+    "signInGoogle": "Sign in with Google",
+    "signInFacebook": "Sign in with Facebook",
+    "signInApple": "Sign in with Apple"
+  },
+  "forms": {
+    "required": "Required field",
+    "email": "Invalid email",
+    "minLength": "Minimum {min} characters",
+    "maxLength": "Maximum {max} characters",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "success": "Success!",
+    "error": "Error",
+    "tryAgain": "Try again"
+  },
+  "atracoes": {
+    "title": "Attractions",
+    "search": "Search attractions...",
+    "filters": "Filters",
+    "category": "Category",
+    "partner": "Partner",
+    "price": "Price",
+    "location": "Location",
+    "results": "{count} attractions found",
+    "noResults": "No attractions found",
+    "rating": "Rating",
+    "duration": "Duration",
+    "bookNow": "Book Now"
+  },
+  "consultoria": {
+    "title": "Personalized Consulting",
+    "subtitle": "Let our specialists create the perfect itinerary for you",
+    "plans": {
+      "basic": "Basic",
+      "premium": "Premium",
+      "vip": "VIP"
+    },
+    "form": {
+      "destination": "Destination",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "budget": "Budget",
+      "preferences": "Preferences",
+      "submit": "Request Consulting"
+    }
+  },
+  "premium": {
+    "title": "Go Premium",
+    "subtitle": "Unlock exclusive features",
+    "features": {
+      "unlimitedRoteiros": "Unlimited itineraries",
+      "prioritySupport": "Priority support",
+      "advancedExports": "Advanced exports",
+      "premiumTemplates": "Premium templates"
+    },
+    "price": "$9.90/month",
+    "upgrade": "Upgrade"
+  },
+  "footer": {
+    "description": "The complete platform to create, customize and share travel itineraries with maps integration and bookings.",
+    "quickLinks": "Quick Links",
+    "partners": "Our Partners",
+    "support": "Support",
+    "about": "About Us",
+    "help": "Help Center",
+    "contact": "Contact",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "copyright": "© 2024 RoteirosApp. All rights reserved.",
+    "madeWith": "Made with ❤️ for passionate travelers"
+  }
+}

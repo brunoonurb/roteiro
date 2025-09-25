@@ -1,0 +1,44 @@
+{
+  "home": {
+    "title": "Planen Sie Ihre Europa-Reise mit Personalisierten Reiserouten",
+    "subtitle": "Erstellen, anpassen und teilen Sie Reiserouten mit exklusiven Tipps und einfachen Buchungen",
+    "cta": "Jetzt Beginnen - Kostenlos",
+    "learnMore": "Mehr Erfahren"
+  },
+  "navigation": {
+    "roteiros": "Reiserouten",
+    "atracoes": "Attraktionen",
+    "consultoria": "Beratung",
+    "dashboard": "Dashboard",
+    "login": "Anmelden",
+    "logout": "Abmelden"
+  },
+  "dashboard": {
+    "title": "Mein Dashboard",
+    "subtitle": "Verwalten Sie Ihre Reiserouten und verfolgen Sie Ihre Statistiken",
+    "stats": {
+      "roteiros": "Reiserouten",
+      "atracoes": "Attraktionen",
+      "visualizacoes": "Aufrufe",
+      "avaliacoes": "Bewertungen",
+      "ingressos": "Tickets"
+    }
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "signOut": "Abmelden",
+    "welcome": "Willkommen"
+  },
+  "forms": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "loading": "Laden...",
+    "success": "Erfolg!",
+    "error": "Fehler"
+  },
+  "criarRoteiro": {
+    "title": "Neue Reiseroute Erstellen",
+    "save": "Reiseroute Erstellen",
+    "cancel": "Abbrechen"
+  }
+}

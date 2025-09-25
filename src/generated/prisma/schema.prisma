@@ -1,0 +1,297 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum TipoPlano {
+  GRATUITO
+  PREMIUM
+}
+
+enum Categoria {
+  CULTURA
+  GASTRONOMIA
+  AVENTURA
+  RELAXAMENTO
+  COMPRAS
+  PARQUES
+}
+
+enum Parceiro {
+  CIVITATIS
+  GETYOURGUIDE
+  VIATOR
+  TIQETS
+  BOOKING
+  AIRBNB
+  MANUAL
+}
+
+enum StatusIngresso {
+  PENDENTE
+  CONFIRMADO
+  CANCELADO
+  USADO
+}
+
+enum RoleUsuario {
+  USER
+  ADMIN
+}
+
+// Models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model User {
+  id                 String      @id @default(cuid())
+  email              String      @unique
+  emailVerified      DateTime?
+  name               String?
+  image              String?
+  plano              TipoPlano   @default(GRATUITO)
+  role               RoleUsuario @default(USER)
+  preferenciasIdioma String      @default("pt")
+  criadoEm           DateTime    @default(now())
+  atualizadoEm       DateTime    @updatedAt
+
+  // Relationships
+  accounts                Account[]
+  sessions                Session[]
+  roteiros                Roteiro[]
+  avaliacoes              Avaliacao[]
+  ingressos               Ingresso[]
+  comentarios             Comentario[]
+  seguidores              Follow[]      @relation("Seguidor")
+  seguindo                Follow[]      @relation("Seguido")
+  consultoriasSolicitadas Consultoria[] @relation("ClienteConsultoria")
+  consultoriasAtendidas   Consultoria[] @relation("ConsultorConsultoria")
+
+  @@map("users")
+}
+
+model Follow {
+  id         String   @id @default(cuid())
+  seguidorId String
+  seguidoId  String
+  criadoEm   DateTime @default(now())
+
+  seguidor User @relation("Seguidor", fields: [seguidorId], references: [id], onDelete: Cascade)
+  seguido  User @relation("Seguido", fields: [seguidoId], references: [id], onDelete: Cascade)
+
+  @@unique([seguidorId, seguidoId])
+  @@map("follows")
+}
+
+model Roteiro {
+  id            String    @id @default(cuid())
+  titulo        String
+  descricao     String?
+  destino       String
+  dataInicio    DateTime
+  dataFim       DateTime
+  publico       Boolean   @default(false)
+  categoria     Categoria
+  orcamento     Decimal?
+  visualizacoes Int       @default(0)
+  usuarioId     String
+  criadoEm      DateTime  @default(now())
+  atualizadoEm  DateTime  @updatedAt
+
+  // Relationships
+  usuario     User         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  dias        DiaRoteiro[]
+  avaliacoes  Avaliacao[]
+  comentarios Comentario[]
+  ingressos   Ingresso[]
+
+  @@map("roteiros")
+}
+
+model DiaRoteiro {
+  id        String   @id @default(cuid())
+  data      DateTime
+  ordem     Int
+  roteiroId String
+  criadoEm  DateTime @default(now())
+
+  // Relationships
+  roteiro  Roteiro      @relation(fields: [roteiroId], references: [id], onDelete: Cascade)
+  atracoes AtracaoDia[]
+
+  @@unique([roteiroId, ordem])
+  @@map("dias_roteiro")
+}
+
+model Atracao {
+  id              String    @id @default(cuid())
+  nome            String
+  descricao       String
+  categoria       Categoria
+  preco           Decimal?
+  moeda           String    @default("BRL")
+  latitude        Decimal
+  longitude       Decimal
+  endereco        String
+  parceiro        Parceiro
+  linkAfiliado    String
+  duracaoEstimada Int // minutos
+  avaliacaoMedia  Decimal   @default(0)
+  totalAvaliacoes Int       @default(0)
+  ativo           Boolean   @default(true)
+  criadoEm        DateTime  @default(now())
+  atualizadoEm    DateTime  @updatedAt
+
+  // Relationships
+  dias       AtracaoDia[]
+  avaliacoes Avaliacao[]
+  ingressos  Ingresso[]
+
+  @@map("atracoes")
+}
+
+model AtracaoDia {
+  id            String   @id @default(cuid())
+  atracaoId     String
+  diaRoteiroId  String
+  horario       String?
+  tempoEstimado Int? // minutos
+  ordem         Int
+  observacoes   String?
+  criadoEm      DateTime @default(now())
+
+  // Relationships
+  atracao    Atracao    @relation(fields: [atracaoId], references: [id], onDelete: Cascade)
+  diaRoteiro DiaRoteiro @relation(fields: [diaRoteiroId], references: [id], onDelete: Cascade)
+
+  @@unique([diaRoteiroId, ordem])
+  @@map("atracoes_dia")
+}
+
+model Avaliacao {
+  id           String    @id @default(cuid())
+  nota         Int // 1-5
+  comentario   String?
+  dataVisita   DateTime?
+  util         Int       @default(0)
+  naoUtil      Int       @default(0)
+  usuarioId    String
+  atracaoId    String?
+  roteiroId    String?
+  criadoEm     DateTime  @default(now())
+  atualizadoEm DateTime  @updatedAt
+
+  // Relationships
+  usuario User     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  atracao Atracao? @relation(fields: [atracaoId], references: [id], onDelete: Cascade)
+  roteiro Roteiro? @relation(fields: [roteiroId], references: [id], onDelete: Cascade)
+
+  @@map("avaliacoes")
+}
+
+model Comentario {
+  id           String   @id @default(cuid())
+  conteudo     String
+  usuarioId    String
+  roteiroId    String
+  parentId     String? // Para threads de comentários
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  // Relationships
+  usuario   User         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  roteiro   Roteiro      @relation(fields: [roteiroId], references: [id], onDelete: Cascade)
+  parent    Comentario?  @relation("ComentarioThread", fields: [parentId], references: [id])
+  respostas Comentario[] @relation("ComentarioThread")
+
+  @@map("comentarios")
+}
+
+model Ingresso {
+  id           String         @id @default(cuid())
+  codigo       String
+  qrCode       String?
+  dataValidade DateTime
+  preco        Decimal?
+  moeda        String         @default("BRL")
+  status       StatusIngresso @default(PENDENTE)
+  observacoes  String?
+  usuarioId    String
+  atracaoId    String
+  roteiroId    String?
+  criadoEm     DateTime       @default(now())
+  atualizadoEm DateTime       @updatedAt
+
+  // Relationships
+  usuario User     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  atracao Atracao  @relation(fields: [atracaoId], references: [id], onDelete: Cascade)
+  roteiro Roteiro? @relation(fields: [roteiroId], references: [id], onDelete: SetNull)
+
+  @@map("ingressos")
+}
+
+model Consultoria {
+  id           String   @id @default(cuid())
+  destino      String
+  dataInicio   DateTime
+  dataFim      DateTime
+  orcamento    Decimal?
+  preferencias String?
+  status       String   @default("PENDENTE") // PENDENTE, EM_ANDAMENTO, CONCLUIDA, CANCELADA
+  preco        Decimal
+  clienteId    String
+  consultorId  String?
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  // Relationships
+  cliente   User  @relation("ClienteConsultoria", fields: [clienteId], references: [id], onDelete: Cascade)
+  consultor User? @relation("ConsultorConsultoria", fields: [consultorId], references: [id], onDelete: SetNull)
+
+  @@map("consultorias")
+}

@@ -1,0 +1,116 @@
+{
+  "home": {
+    "title": "Planifica tu Viaje a Europa con Itinerarios Personalizados",
+    "subtitle": "Crea, personaliza y comparte itinerarios con consejos exclusivos y reservas fáciles",
+    "cta": "Comenzar Ahora - Gratis",
+    "learnMore": "Saber Más",
+    "features": {
+      "free": "Sin costo inicial",
+      "maps": "Integración con mapas",
+      "offline": "Funciona offline"
+    }
+  },
+  "navigation": {
+    "roteiros": "Itinerarios",
+    "atracoes": "Atracciones",
+    "consultoria": "Consultoría",
+    "dashboard": "Panel",
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión"
+  },
+  "beneficios": {
+    "title": "¿Por qué elegir RoteirosApp?",
+    "subtitle": "Todo lo que necesitas para planificar el viaje perfecto en una plataforma",
+    "personalizacao": {
+      "title": "Personalización Completa",
+      "description": "Crea itinerarios únicos arrastrando y soltando atracciones, con horarios personalizados y categorías específicas."
+    },
+    "avaliacoes": {
+      "title": "Reseñas por Atracción",
+      "description": "Ve reseñas detalladas de otros viajeros y contribuye con tus propias experiencias en cada atracción."
+    },
+    "mapas": {
+      "title": "Integración con Mapas",
+      "description": "Visualiza tus atracciones en el mapa, calcula distancias y tiempos de desplazamiento entre puntos del itinerario."
+    },
+    "reservas": {
+      "title": "Reservas Integradas",
+      "description": "Accede directamente a enlaces de socios como Civitatis, GetYourGuide, Viator y Tiqets para reservar actividades."
+    },
+    "offline": {
+      "title": "Funciona Offline",
+      "description": "Accede a tus itinerarios incluso sin internet. Exporta como PDF y añade entradas a la cartera digital."
+    },
+    "compartilhamento": {
+      "title": "Compartir Social",
+      "description": "Comparte tus itinerarios con amigos vía WhatsApp, Facebook, Instagram o enlace directo."
+    }
+  },
+  "dashboard": {
+    "title": "Mi Panel",
+    "subtitle": "Gestiona tus itinerarios y sigue tus estadísticas",
+    "stats": {
+      "roteiros": "Itinerarios",
+      "atracoes": "Atracciones",
+      "visualizacoes": "Visualizaciones",
+      "avaliacoes": "Reseñas",
+      "ingressos": "Entradas"
+    },
+    "recentRoteiros": "Itinerarios Recientes",
+    "viewAll": "Ver Todos",
+    "noRoteiros": "Aún no has creado itinerarios",
+    "createFirst": "Crear Primer Itinerario"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "signUp": "Registrarse",
+    "welcome": "Bienvenido(a)",
+    "signInWith": "Iniciar sesión con {provider}",
+    "signInGoogle": "Iniciar sesión con Google",
+    "signInFacebook": "Iniciar sesión con Facebook",
+    "signInApple": "Iniciar sesión con Apple"
+  },
+  "forms": {
+    "required": "Campo obligatorio",
+    "email": "Email inválido",
+    "minLength": "Mínimo {min} caracteres",
+    "maxLength": "Máximo {max} caracteres",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "success": "¡Éxito!",
+    "error": "Error",
+    "tryAgain": "Intentar de nuevo"
+  },
+  "criarRoteiro": {
+    "title": "Crear Nuevo Itinerario",
+    "subtitle": "Planifica tu viaje perfecto con atracciones, horarios y consejos personalizados",
+    "basicInfo": "Información Básica",
+    "roteiroTitle": "Título del Itinerario",
+    "description": "Descripción",
+    "public": "Hacer itinerario público (otros usuarios podrán copiarlo)",
+    "cancel": "Cancelar",
+    "save": "Crear Itinerario",
+    "update": "Actualizar Itinerario",
+    "saving": "Guardando..."
+  },
+  "footer": {
+    "description": "La plataforma completa para crear, personalizar y compartir itinerarios de viaje con integración de mapas y reservas.",
+    "quickLinks": "Enlaces Rápidos",
+    "partners": "Nuestros Socios",
+    "support": "Soporte",
+    "about": "Sobre Nosotros",
+    "help": "Centro de Ayuda",
+    "contact": "Contacto",
+    "terms": "Términos de Uso",
+    "privacy": "Política de Privacidad",
+    "copyright": "© 2024 RoteirosApp. Todos los derechos reservados.",
+    "madeWith": "Hecho con ❤️ para viajeros apasionados"
+  }
+}

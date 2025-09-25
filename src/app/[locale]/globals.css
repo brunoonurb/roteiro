@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Cores mais suaves - sobrescrever cores muito vibrantes */
+@layer utilities {
+  /* Sobrescrever bg-blue-600 para uma cor mais suave */
+  .bg-blue-600 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(14 165 233 / var(--tw-bg-opacity)); /* sky-500 */
+  }
+  
+  /* Sobrescrever bg-blue-700 para uma cor mais suave */
+  .bg-blue-700 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(2 132 199 / var(--tw-bg-opacity)); /* sky-600 */
+  }
+  
+  /* Sobrescrever bg-blue-500 para uma cor mais suave */
+  .bg-blue-500 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(56 189 248 / var(--tw-bg-opacity)); /* sky-400 */
+  }
+  
+  /* Sobrescrever text-blue-600 para uma cor mais suave */
+  .text-blue-600 {
+    --tw-text-opacity: 1;
+    color: rgb(2 132 199 / var(--tw-text-opacity)); /* sky-600 */
+  }
+  
+  /* Sobrescrever text-blue-700 para uma cor mais suave */
+  .text-blue-700 {
+    --tw-text-opacity: 1;
+    color: rgb(3 105 161 / var(--tw-text-opacity)); /* sky-700 */
+  }
+  
+  /* Sobrescrever text-blue-800 para uma cor mais suave */
+  .text-blue-800 {
+    --tw-text-opacity: 1;
+    color: rgb(7 89 133 / var(--tw-text-opacity)); /* sky-800 */
+  }
+  
+  /* Sobrescrever bg-blue-100 para uma cor mais suave */
+  .bg-blue-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(224 242 254 / var(--tw-bg-opacity)); /* sky-100 */
+  }
+  
+  /* Sobrescrever bg-blue-50 para uma cor mais suave */
+  .bg-blue-50 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(240 249 255 / var(--tw-bg-opacity)); /* sky-50 */
+  }
+  
+  /* Sobrescrever border-blue-500 para uma cor mais suave */
+  .border-blue-500 {
+    --tw-border-opacity: 1;
+    border-color: rgb(56 189 248 / var(--tw-border-opacity)); /* sky-400 */
+  }
+  
+  /* Sobrescrever border-blue-600 para uma cor mais suave */
+  .border-blue-600 {
+    --tw-border-opacity: 1;
+    border-color: rgb(14 165 233 / var(--tw-border-opacity)); /* sky-500 */
+  }
+}
+
+/* Hover states com cores mais suaves */
+@layer utilities {
+  .hover\:bg-blue-700:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(3 105 161 / var(--tw-bg-opacity)); /* sky-700 */
+  }
+  
+  .hover\:text-blue-600:hover {
+    --tw-text-opacity: 1;
+    color: rgb(14 165 233 / var(--tw-text-opacity)); /* sky-500 */
+  }
+  
+  .hover\:border-blue-500:hover {
+    --tw-border-opacity: 1;
+    border-color: rgb(56 189 248 / var(--tw-border-opacity)); /* sky-400 */
+  }
+}

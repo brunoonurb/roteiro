@@ -1,0 +1,44 @@
+{
+  "home": {
+    "title": "Pianifica il tuo Viaggio in Europa con Itinerari Personalizzati",
+    "subtitle": "Crea, personalizza e condividi itinerari con consigli esclusivi e prenotazioni facili",
+    "cta": "Inizia Ora - Gratis",
+    "learnMore": "Scopri di Più"
+  },
+  "navigation": {
+    "roteiros": "Itinerari",
+    "atracoes": "Attrazioni",
+    "consultoria": "Consulenza",
+    "dashboard": "Dashboard",
+    "login": "Accedi",
+    "logout": "Esci"
+  },
+  "dashboard": {
+    "title": "La Mia Dashboard",
+    "subtitle": "Gestisci i tuoi itinerari e monitora le tue statistiche",
+    "stats": {
+      "roteiros": "Itinerari",
+      "atracoes": "Attrazioni",
+      "visualizacoes": "Visualizzazioni",
+      "avaliacoes": "Recensioni",
+      "ingressos": "Biglietti"
+    }
+  },
+  "auth": {
+    "signIn": "Accedi",
+    "signOut": "Esci",
+    "welcome": "Benvenuto"
+  },
+  "forms": {
+    "save": "Salva",
+    "cancel": "Annulla",
+    "loading": "Caricamento...",
+    "success": "Successo!",
+    "error": "Errore"
+  },
+  "criarRoteiro": {
+    "title": "Crea Nuovo Itinerario",
+    "save": "Crea Itinerario",
+    "cancel": "Annulla"
+  }
+}
