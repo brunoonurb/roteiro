@@ -1,414 +1,346 @@
 'use client'
 
-import { useState } from 'react'
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-  DragStartEvent,
-  DragOverlay,
-} from '@dnd-kit/core'
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import {
-  useSortable,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { useState, useEffect } from 'react'
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
+import { 
+  PlusIcon, 
+  TrashIcon, 
+  ClockIcon, 
+  MapPinIcon,
+  CurrencyDollarIcon,
+  Bars3Icon
+} from '@heroicons/react/24/outline'
 import { motion, AnimatePresence } from 'framer-motion'
-import { GripVertical, Plus, Trash2, MapPin, Clock, Star } from 'lucide-react'
-import { PlaceResult, getPlacesService } from '@/lib/places'
-import BuscaAtracoes from './BuscaAtracoes'
+
+interface Atracao {
+  id: string
+  nome: string
+  categoria: string
+  preco?: number
+  moeda?: string
+  duracaoEstimada?: number
+  latitude?: number
+  longitude?: number
+  endereco?: string
+  linkAfiliado?: string
+  parceiro?: string
+  imagem?: string
+}
 
 interface DiaRoteiro {
   id: string
-  data: string
-  atracoes: AtracaoRoteiro[]
-}
-
-interface AtracaoRoteiro {
-  id: string
-  nome: string
-  descricao?: string
-  categoria: string
-  endereco?: string
-  latitude?: number
-  longitude?: number
-  linkAfiliado?: string
-  parceiro?: string
-  preco?: number
-  duracao?: number
-  imagem?: string
-  rating?: number
-  horarioAbertura?: string
-  horarioFechamento?: string
+  data: Date
+  ordem: number
+  atracoes: Atracao[]
 }
 
 interface DragDropRoteiroProps {
   dias: DiaRoteiro[]
-  onUpdateDias: (dias: DiaRoteiro[]) => void
-  location?: { lat: number; lng: number }
+  onDiasChange: (dias: DiaRoteiro[]) => void
+  onAtracaoAdd: (diaId: string, atracao: Atracao) => void
+  onAtracaoRemove: (diaId: string, atracaoId: string) => void
+  onAtracaoReorder: (diaId: string, startIndex: number, endIndex: number) => void
+  onAtracaoMoveBetweenDays: (sourceDayId: string, destDayId: string, startIndex: number, endIndex: number) => void
+  className?: string
 }
 
-function SortableDia({ dia, onUpdateDia, onDeleteDia, location }: {
-  dia: DiaRoteiro
-  onUpdateDia: (dia: DiaRoteiro) => void
-  onDeleteDia: (diaId: string) => void
-  location?: { lat: number; lng: number }
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: dia.id })
+export default function DragDropRoteiro({
+  dias,
+  onDiasChange,
+  onAtracaoAdd,
+  onAtracaoRemove,
+  onAtracaoReorder,
+  onAtracaoMoveBetweenDays,
+  className = ''
+}: DragDropRoteiroProps) {
+  const [isDragDisabled, setIsDragDisabled] = useState(false)
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
+  const handleDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId, type } = result
 
-  const addAtracao = (place: PlaceResult) => {
-    const novaAtracao: AtracaoRoteiro = {
-      id: `atracao-${Date.now()}`,
-      nome: place.name,
-      descricao: place.formatted_address,
-      categoria: place.types.includes('museum') ? 'cultura' : 
-                place.types.includes('restaurant') ? 'gastronomia' :
-                place.types.includes('park') ? 'parques' :
-                place.types.includes('shopping_mall') ? 'compras' : 'outros',
-      endereco: place.formatted_address,
-      latitude: place.geometry.location.lat,
-      longitude: place.geometry.location.lng,
-      rating: place.rating,
-      preco: place.price_level ? place.price_level * 20 : undefined,
-      horarioAbertura: place.opening_hours?.weekday_text?.[0]?.split(' ')[1] || '09:00',
-      horarioFechamento: place.opening_hours?.weekday_text?.[0]?.split(' ')[3] || '18:00',
-      imagem: place.photos?.[0] ? getPlacesService().getPhotoUrl(place.photos[0].photo_reference, 200) : undefined,
+    // Se não há destino, não faz nada
+    if (!destination) return
+
+    // Se o item foi solto na mesma posição, não faz nada
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return
     }
 
-    onUpdateDia({
-      ...dia,
-      atracoes: [...dia.atracoes, novaAtracao]
-    })
-  }
+    if (type === 'ATRACAO') {
+      const sourceDayId = source.droppableId
+      const destDayId = destination.droppableId
 
-  const removeAtracao = (atracaoId: string) => {
-    onUpdateDia({
-      ...dia,
-      atracoes: dia.atracoes.filter(a => a.id !== atracaoId)
-    })
-  }
-
-  const moveAtracao = (fromIndex: number, toIndex: number) => {
-    const newAtracoes = arrayMove(dia.atracoes, fromIndex, toIndex)
-    onUpdateDia({
-      ...dia,
-      atracoes: newAtracoes
-    })
-  }
-
-  return (
-    <motion.div
-      ref={setNodeRef}
-      style={style}
-      className={`bg-white rounded-lg shadow-md border-2 border-gray-200 p-6 ${
-        isDragging ? 'opacity-50 shadow-xl' : ''
-      }`}
-      layout
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div
-            {...attributes}
-            {...listeners}
-            className="cursor-grab hover:cursor-grabbing p-1 text-gray-400 hover:text-gray-600"
-          >
-            <GripVertical className="w-5 h-5" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-800">
-            Dia {dia.id.split('-')[1]} - {new Date(dia.data).toLocaleDateString('pt-BR')}
-          </h3>
-        </div>
-        <button
-          onClick={() => onDeleteDia(dia.id)}
-          className="text-red-500 hover:text-red-700 p-1"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* Busca de Atrações */}
-      <div className="mb-4">
-        <BuscaAtracoes
-          onSelectAtracao={addAtracao}
-          location={location}
-          className="w-full"
-        />
-      </div>
-
-      {/* Lista de Atrações */}
-      <div className="space-y-3">
-        <AnimatePresence>
-          {dia.atracoes.map((atracao, index) => (
-            <SortableAtracao
-              key={atracao.id}
-              atracao={atracao}
-              index={index}
-              onRemove={() => removeAtracao(atracao.id)}
-              onMove={(fromIndex, toIndex) => moveAtracao(fromIndex, toIndex)}
-            />
-          ))}
-        </AnimatePresence>
-      </div>
-
-      {dia.atracoes.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          <MapPin className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-          <p>Nenhuma atração adicionada ainda</p>
-          <p className="text-sm">Use a busca acima para adicionar atrações</p>
-        </div>
-      )}
-    </motion.div>
-  )
-}
-
-function SortableAtracao({ atracao, index, onRemove, onMove }: {
-  atracao: AtracaoRoteiro
-  index: number
-  onRemove: () => void
-  onMove: (fromIndex: number, toIndex: number) => void
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: atracao.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
-
-  return (
-    <motion.div
-      ref={setNodeRef}
-      style={style}
-      className={`bg-gray-50 rounded-lg p-4 border border-gray-200 ${
-        isDragging ? 'opacity-50 shadow-lg' : ''
-      }`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      layout
-    >
-      <div className="flex items-start gap-3">
-        <div
-          {...attributes}
-          {...listeners}
-          className="cursor-grab hover:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 mt-1"
-        >
-          <GripVertical className="w-4 h-4" />
-        </div>
-        
-        <div className="flex-1">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900">{atracao.nome}</h4>
-              {atracao.descricao && (
-                <p className="text-sm text-gray-600 mt-1">{atracao.descricao}</p>
-              )}
-              
-              <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                  {atracao.categoria}
-                </span>
-                
-                {atracao.rating && (
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span>{atracao.rating.toFixed(1)}</span>
-                  </div>
-                )}
-                
-                {atracao.preco && (
-                  <div className="flex items-center gap-1">
-                    <span className="font-medium">R$ {atracao.preco}</span>
-                  </div>
-                )}
-                
-                {atracao.duracao && (
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{atracao.duracao}min</span>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <button
-              onClick={onRemove}
-              className="text-red-500 hover:text-red-700 p-1 ml-2"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  )
-}
-
-export default function DragDropRoteiro({ dias, onUpdateDias, location }: DragDropRoteiroProps) {
-  const [activeId, setActiveId] = useState<string | null>(null)
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
-
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string)
-  }
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-
-    if (!over) return
-
-    const activeId = active.id as string
-    const overId = over.id as string
-
-    if (activeId === overId) return
-
-    // Check if we're moving a day
-    const activeDayIndex = dias.findIndex(dia => dia.id === activeId)
-    const overDayIndex = dias.findIndex(dia => dia.id === overId)
-
-    if (activeDayIndex !== -1 && overDayIndex !== -1) {
-      // Moving days
-      const newDias = arrayMove(dias, activeDayIndex, overDayIndex)
-      onUpdateDias(newDias)
-    } else {
-      // Moving attractions within a day
-      const activeDia = dias.find(dia => 
-        dia.atracoes.some(atracao => atracao.id === activeId)
-      )
-      const overDia = dias.find(dia => 
-        dia.atracoes.some(atracao => atracao.id === overId)
-      )
-
-      if (activeDia && overDia && activeDia.id === overDia.id) {
-        const activeIndex = activeDia.atracoes.findIndex(a => a.id === activeId)
-        const overIndex = activeDia.atracoes.findIndex(a => a.id === overId)
-
-        if (activeIndex !== -1 && overIndex !== -1) {
-          const newAtracoes = arrayMove(activeDia.atracoes, activeIndex, overIndex)
-          const newDias = dias.map(dia => 
-            dia.id === activeDia.id 
-              ? { ...dia, atracoes: newAtracoes }
-              : dia
-          )
-          onUpdateDias(newDias)
-        }
+      if (sourceDayId === destDayId) {
+        // Reordenação dentro do mesmo dia
+        onAtracaoReorder(sourceDayId, source.index, destination.index)
+      } else {
+        // Movimento entre dias
+        onAtracaoMoveBetweenDays(sourceDayId, destDayId, source.index, destination.index)
       }
     }
-
-    setActiveId(null)
   }
 
-  const addDia = () => {
-    const novoDia: DiaRoteiro = {
-      id: `dia-${Date.now()}`,
-      data: new Date().toISOString().split('T')[0],
-      atracoes: []
-    }
-    onUpdateDias([...dias, novoDia])
+  const handleDragStart = () => {
+    setIsDragDisabled(false)
   }
 
-  const updateDia = (diaAtualizada: DiaRoteiro) => {
-    const newDias = dias.map(dia => 
-      dia.id === diaAtualizada.id ? diaAtualizada : dia
-    )
-    onUpdateDias(newDias)
+  const formatarData = (data: Date) => {
+    return data.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit'
+    })
   }
 
-  const deleteDia = (diaId: string) => {
-    onUpdateDias(dias.filter(dia => dia.id !== diaId))
+  const formatarDuracao = (minutos?: number) => {
+    if (!minutos) return '--'
+    if (minutos < 60) return `${minutos}min`
+    const horas = Math.floor(minutos / 60)
+    const minRestantes = minutos % 60
+    return minRestantes > 0 ? `${horas}h ${minRestantes}min` : `${horas}h`
+  }
+
+  const formatarPreco = (preco?: number, moeda?: string) => {
+    if (!preco) return 'Gratuito'
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: moeda || 'BRL'
+    }).format(preco)
+  }
+
+  const categoriaColors: Record<string, string> = {
+    CULTURA: 'bg-purple-100 text-purple-800 border-purple-200',
+    GASTRONOMIA: 'bg-orange-100 text-orange-800 border-orange-200',
+    AVENTURA: 'bg-green-100 text-green-800 border-green-200',
+    RELAXAMENTO: 'bg-blue-100 text-blue-800 border-blue-200',
+    COMPRAS: 'bg-pink-100 text-pink-800 border-pink-200',
+    PARQUES: 'bg-emerald-100 text-emerald-800 border-emerald-200'
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">Dias do Roteiro</h2>
-        <button
-          onClick={addDia}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Adicionar Dia
-        </button>
-      </div>
-
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={dias.map(dia => dia.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-4">
-            {dias.map((dia) => (
-              <SortableDia
-                key={dia.id}
-                dia={dia}
-                onUpdateDia={updateDia}
-                onDeleteDia={deleteDia}
-                location={location}
-              />
-            ))}
-          </div>
-        </SortableContext>
-
-        <DragOverlay>
-          {activeId ? (
-            <div className="bg-white rounded-lg shadow-xl border-2 border-blue-500 p-6 opacity-90">
-              <div className="flex items-center gap-3">
-                <GripVertical className="w-5 h-5 text-gray-400" />
-                <span className="font-semibold">Arrastando...</span>
+    <div className={className}>
+      <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+        <div className="space-y-6">
+          {dias.map((dia) => (
+            <motion.div
+              key={dia.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-lg shadow-sm border border-gray-200"
+            >
+              {/* Header do Dia */}
+              <div className="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Bars3Icon className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 capitalize">
+                        {formatarData(dia.data)}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Dia {dia.ordem} • {dia.atracoes.length} atração{dia.atracoes.length !== 1 ? 'ões' : ''}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={() => {
+                      // Aqui você pode abrir um modal para adicionar atração
+                      console.log('Adicionar atração ao dia:', dia.id)
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    <PlusIcon className="w-4 h-4" />
+                    Adicionar
+                  </button>
+                </div>
               </div>
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
 
-      {dias.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <MapPin className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum dia adicionado</h3>
-          <p className="text-gray-600 mb-4">Comece criando o primeiro dia do seu roteiro</p>
-          <button
-            onClick={addDia}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mx-auto"
-          >
-            <Plus className="w-5 h-5" />
-            Adicionar Primeiro Dia
-          </button>
+              {/* Área de Drop */}
+              <Droppable droppableId={dia.id} type="ATRACAO">
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className={`p-4 min-h-[120px] transition-colors ${
+                      snapshot.isDraggingOver 
+                        ? 'bg-blue-50 border-2 border-dashed border-blue-300' 
+                        : 'bg-white'
+                    }`}
+                  >
+                    <AnimatePresence>
+                      {dia.atracoes.length === 0 ? (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="flex flex-col items-center justify-center py-8 text-gray-500"
+                        >
+                          <MapPinIcon className="w-12 h-12 mb-3 opacity-50" />
+                          <p className="text-sm">Nenhuma atração adicionada</p>
+                          <p className="text-xs">Arraste atrações aqui ou clique em "Adicionar"</p>
+                        </motion.div>
+                      ) : (
+                        dia.atracoes.map((atracao, index) => (
+                          <Draggable
+                            key={atracao.id}
+                            draggableId={atracao.id}
+                            index={index}
+                            isDragDisabled={isDragDisabled}
+                          >
+                            {(provided, snapshot) => (
+                              <motion.div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ 
+                                  opacity: 1, 
+                                  scale: 1,
+                                  rotate: snapshot.isDragging ? 2 : 0
+                                }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                whileHover={{ scale: 1.02 }}
+                                className={`mb-3 p-4 bg-white border rounded-lg shadow-sm cursor-move transition-all ${
+                                  snapshot.isDragging 
+                                    ? 'shadow-lg border-blue-300 rotate-2' 
+                                    : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                                }`}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex items-start gap-3 flex-1">
+                                    {/* Handle de Drag */}
+                                    <div className="p-1 bg-gray-100 rounded cursor-grab active:cursor-grabbing">
+                                      <Bars3Icon className="w-4 h-4 text-gray-500" />
+                                    </div>
+
+                                    {/* Imagem da Atração */}
+                                    {atracao.imagem && (
+                                      <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                                        <img
+                                          src={atracao.imagem}
+                                          alt={atracao.nome}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
+                                    )}
+
+                                    {/* Informações da Atração */}
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-start justify-between mb-2">
+                                        <h4 className="font-medium text-gray-900 truncate">
+                                          {atracao.nome}
+                                        </h4>
+                                        <span className={`px-2 py-1 text-xs font-medium rounded-full border ${
+                                          categoriaColors[atracao.categoria] || 'bg-gray-100 text-gray-800 border-gray-200'
+                                        }`}>
+                                          {atracao.categoria}
+                                        </span>
+                                      </div>
+
+                                      {atracao.endereco && (
+                                        <p className="text-sm text-gray-600 mb-2 line-clamp-1">
+                                          📍 {atracao.endereco}
+                                        </p>
+                                      )}
+
+                                      {/* Detalhes */}
+                                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                                        <div className="flex items-center gap-1">
+                                          <ClockIcon className="w-4 h-4" />
+                                          <span>{formatarDuracao(atracao.duracaoEstimada)}</span>
+                                        </div>
+                                        
+                                        <div className="flex items-center gap-1">
+                                          <CurrencyDollarIcon className="w-4 h-4" />
+                                          <span>{formatarPreco(atracao.preco, atracao.moeda)}</span>
+                                        </div>
+
+                                        {atracao.parceiro && (
+                                          <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                                            {atracao.parceiro}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Ações */}
+                                  <div className="flex items-center gap-2 ml-4">
+                                    {atracao.linkAfiliado && (
+                                      <a
+                                        href={atracao.linkAfiliado}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Ver detalhes"
+                                      >
+                                        🔗
+                                      </a>
+                                    )}
+                                    
+                                    <button
+                                      onClick={() => onAtracaoRemove(dia.id, atracao.id)}
+                                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                      title="Remover atração"
+                                    >
+                                      <TrashIcon className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </Draggable>
+                        ))
+                      )}
+                    </AnimatePresence>
+
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+
+              {/* Footer do Dia */}
+              <div className="p-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <ClockIcon className="w-4 h-4" />
+                      <span>
+                        {formatarDuracao(
+                          dia.atracoes.reduce((total, atracao) => 
+                            total + (atracao.duracaoEstimada || 0), 0
+                          )
+                        )}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-1">
+                      <CurrencyDollarIcon className="w-4 h-4" />
+                      <span>
+                        {formatarPreco(
+                          dia.atracoes.reduce((total, atracao) => 
+                            total + (atracao.preco || 0), 0
+                          )
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <span className="text-xs">
+                    {dia.atracoes.length} item{dia.atracoes.length !== 1 ? 's' : ''}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
-      )}
+      </DragDropContext>
     </div>
   )
 }

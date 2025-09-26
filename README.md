@@ -16,6 +16,17 @@ Uma plataforma web responsiva para criação, personalização e compartilhament
 - **Exportação PDF**: Geração de PDFs dos roteiros
 - **SEO**: Otimizado para motores de busca
 
+### ✅ Funcionalidades Avançadas Implementadas
+- **Sistema de Favoritos**: Favoritar atrações e roteiros com sincronização
+- **Votação em Avaliações**: Sistema útil/não útil com contadores em tempo real
+- **Templates de Roteiros**: Templates públicos com filtros avançados
+- **Moderação Automática**: Detecção e censura de conteúdo ofensivo
+- **Estimativas Inteligentes**: Cálculo automático de custos e duração
+- **Exportação Completa**: PDF profissional e JSON estruturado
+- **Contador de Viagem**: Countdown e status de viagem
+- **Drag-and-Drop Avançado**: Reordenação entre dias com animações
+- **Tracking de Afiliados**: Sistema de rastreamento de cliques
+
 ### 🔗 Integrações
 - **Google Maps API**: Visualização de mapas e rotas
 - **Parceiros de Afiliados**: Civitatis, GetYourGuide, Viator, Tiqets
@@ -33,10 +44,12 @@ Uma plataforma web responsiva para criação, personalização e compartilhament
 - **PWA**: next-pwa
 - **Internacionalização**: next-intl
 - **Validação**: Zod
-- **PDF**: jsPDF
+- **PDF**: jsPDF + jspdf-autotable
 - **Carteiras Digitais**: passkit-generator
 - **Animações**: Framer Motion
-- **Drag & Drop**: @dnd-kit
+- **Drag & Drop**: @hello-pangea/dnd (substituiu @dnd-kit)
+- **Moderação**: Sistema personalizado de detecção de conteúdo
+- **Estimativas**: Algoritmos de cálculo de custos e duração
 
 ## 📋 Pré-requisitos
 
@@ -133,33 +146,74 @@ Para adicionar novos idiomas:
 ```sql
 -- Usuários
 User {
-  id, name, email, image, createdAt, updatedAt
+  id, name, email, image, plano, role, preferenciasIdioma, createdAt, updatedAt
 }
 
 -- Roteiros
 Roteiro {
-  id, titulo, descricao, dias (JSON), publico, usuarioId
+  id, titulo, descricao, destino, dataInicio, dataFim, publico, categoria
+  orcamento, custoEstimado, duracaoEstimada, templateSourceId, visualizacoes, usuarioId
+}
+
+-- Dias do Roteiro
+DiaRoteiro {
+  id, data, ordem, roteiroId
 }
 
 -- Atrações
 Atracao {
-  id, nome, descricao, categoria, endereco, latitude, longitude
-  linkAfiliado, parceiro, preco, duracao, imagem
+  id, nome, descricao, categoria, preco, moeda, latitude, longitude
+  endereco, parceiro, linkAfiliado, duracaoEstimada, avaliacaoMedia, totalAvaliacoes
+}
+
+-- Atrações por Dia
+AtracaoDia {
+  id, atracaoId, diaRoteiroId, horario, tempoEstimado, ordem, observacoes
 }
 
 -- Avaliações
 Avaliacao {
-  id, nota, comentario, atracaoId, usuarioId
+  id, nota, comentario, dataVisita, util, naoUtil, isModerado, isAprovado
+  usuarioId, atracaoId, roteiroId
+}
+
+-- Votos de Avaliações
+VotoAvaliacao {
+  id, avaliacaoId, usuarioId, isUtil
+}
+
+-- Favoritos
+Favorito {
+  id, usuarioId, targetType, targetId
+}
+
+-- Templates de Roteiros
+TemplateRoteiro {
+  id, titulo, descricao, destino, categoria, duracaoDias
+  custoEstimado, moeda, isPublico, autorId
 }
 
 -- Ingressos
 Ingresso {
-  id, codigo, data, atracao, preco, roteiroId, usuarioId
+  id, codigo, qrCode, dataValidade, preco, moeda, status, observacoes
+  usuarioId, atracaoId, roteiroId
+}
+
+-- Cliques de Afiliados
+CliqueAfiliado {
+  id, usuarioId, provider, productRef, roteiroId, itemId
+  utmSource, utmMedium, utmCampaign, ipHash, userAgentHash
 }
 
 -- Consultoria
 Consultoria {
-  id, destino, datas, preferencias, orcamento, status, valor
+  id, destino, dataInicio, dataFim, orcamento, preferencias, status, preco
+  clienteId, consultorId
+}
+
+-- Jobs de Sincronização
+SyncJob {
+  id, usuarioId, type, status, payload, result, createdAt, updatedAt
 }
 ```
 
