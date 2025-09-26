@@ -91,8 +91,43 @@ export const updateAtracaoSchema = z.object({
   avaliacaoMedia: z.number().min(0).max(5).optional(),
   totalAvaliacoes: z.number().nonnegative().optional(),
   linkAfiliado: z.string().url('URL inválida').optional(),
-  parceiro: z.enum(['CIVITATIS', 'GETYOURGUIDE', 'VIATOR', 'TIQETS', 'BOOKING', 'AIRBNB']).optional(),
+  parceiro: z.enum(['CIVITATIS', 'GETYOURGUIDE', 'VIATOR', 'TIQETS', 'BOOKING', 'AIRBNB', 'MANUAL']).optional(),
   imagem: z.string().url('URL da imagem inválida').optional()
+})
+
+// Transport Schemas
+export const createTransportPartnerSchema = z.object({
+  nome: z.string().min(2),
+  tipo: z.enum(['UBER', 'METRO', 'ONIBUS', 'CARRO', 'A_PE', 'OUTRO']),
+  ativo: z.boolean().default(true),
+  config: z.record(z.any()).optional()
+})
+
+export const updateTransportPartnerSchema = z.object({
+  nome: z.string().min(2).optional(),
+  tipo: z.enum(['UBER', 'METRO', 'ONIBUS', 'CARRO', 'A_PE', 'OUTRO']).optional(),
+  ativo: z.boolean().optional(),
+  config: z.record(z.any()).optional()
+})
+
+export const createTransportTariffManualSchema = z.object({
+  cidade: z.string().min(2),
+  moeda: z.string().length(3).default('BRL'),
+  tipo: z.enum(['UBER', 'METRO', 'ONIBUS', 'CARRO', 'A_PE', 'OUTRO']),
+  custoFixo: z.number().nonnegative().default(0),
+  custoPorKm: z.number().nonnegative().default(0),
+  custoPorMin: z.number().nonnegative().default(0),
+  observacoes: z.string().max(500).optional()
+})
+
+export const updateTransportTariffManualSchema = z.object({
+  cidade: z.string().min(2).optional(),
+  moeda: z.string().length(3).optional(),
+  tipo: z.enum(['UBER', 'METRO', 'ONIBUS', 'CARRO', 'A_PE', 'OUTRO']).optional(),
+  custoFixo: z.number().nonnegative().optional(),
+  custoPorKm: z.number().nonnegative().optional(),
+  custoPorMin: z.number().nonnegative().optional(),
+  observacoes: z.string().max(500).optional()
 })
 
 // AtracaoDia Schemas

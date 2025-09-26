@@ -35,6 +35,17 @@ enum Parceiro {
   MANUAL
 }
 
+// Tipos de transporte entre itens do roteiro
+enum TransporteTipo {
+  UBER
+  METRO
+  ONIBUS
+  A_PE
+  CARRO
+  TRANSITO
+  MANUAL
+}
+
 enum StatusIngresso {
   PENDENTE
   CONFIRMADO
@@ -211,6 +222,12 @@ model AtracaoDia {
   tempoEstimado Int? // minutos
   ordem         Int
   observacoes   String?
+  // Transporte entre este item e o próximo
+  transporteTipo TransporteTipo?
+  transporteParceiro Parceiro?
+  transporteDescricao String?
+  transporteCusto  Decimal?
+  transporteTempo  Int? // minutos
   criadoEm      DateTime @default(now())
 
   // Relationships
@@ -391,4 +408,32 @@ model SyncJob {
   usuario User @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@map("sync_jobs")
+}
+
+// Parceiros de transporte (Uber, etc.) e tarifas manuais
+model TransportPartner {
+  id      String @id @default(cuid())
+  nome    String
+  tipo    String // UBER, METRO, ONIBUS, CARRO, A_PE, OUTRO
+  ativo   Boolean @default(true)
+  config  Json?
+  criadoEm DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@map("transport_partners")
+}
+
+model TransportTariffManual {
+  id         String   @id @default(cuid())
+  cidade     String
+  moeda      String   @default("BRL")
+  tipo       String   // UBER, METRO, ONIBUS, CARRO, A_PE, OUTRO
+  custoFixo  Decimal  @default(0)
+  custoPorKm Decimal  @default(0)
+  custoPorMin Decimal @default(0)
+  observacoes String?
+  criadoEm   DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@map("transport_tariffs_manual")
 }
