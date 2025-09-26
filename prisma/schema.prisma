@@ -409,3 +409,31 @@ model SyncJob {
 
   @@map("sync_jobs")
 }
+
+// Parceiros de transporte (Uber, etc.) e tarifas manuais
+model TransportPartner {
+  id      String @id @default(cuid())
+  nome    String
+  tipo    String // UBER, METRO, ONIBUS, CARRO, A_PE, OUTRO
+  ativo   Boolean @default(true)
+  config  Json?
+  criadoEm DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@map("transport_partners")
+}
+
+model TransportTariffManual {
+  id         String   @id @default(cuid())
+  cidade     String
+  moeda      String   @default("BRL")
+  tipo       String   // UBER, METRO, ONIBUS, CARRO, A_PE, OUTRO
+  custoFixo  Decimal  @default(0)
+  custoPorKm Decimal  @default(0)
+  custoPorMin Decimal @default(0)
+  observacoes String?
+  criadoEm   DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@map("transport_tariffs_manual")
+}
