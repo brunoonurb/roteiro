@@ -35,6 +35,17 @@ enum Parceiro {
   MANUAL
 }
 
+// Tipos de transporte entre itens do roteiro
+enum TransporteTipo {
+  UBER
+  METRO
+  ONIBUS
+  A_PE
+  CARRO
+  TRANSITO
+  MANUAL
+}
+
 enum StatusIngresso {
   PENDENTE
   CONFIRMADO
@@ -211,6 +222,12 @@ model AtracaoDia {
   tempoEstimado Int? // minutos
   ordem         Int
   observacoes   String?
+  // Transporte entre este item e o próximo
+  transporteTipo TransporteTipo?
+  transporteParceiro Parceiro?
+  transporteDescricao String?
+  transporteCusto  Decimal?
+  transporteTempo  Int? // minutos
   criadoEm      DateTime @default(now())
 
   // Relationships
