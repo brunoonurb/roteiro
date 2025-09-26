@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { createAvaliacaoSchema } from '@/lib/schemas'
+import { fullModeration } from '@/lib/moderation'
 
 // Buscar avaliações
 export async function GET(request: NextRequest) {
@@ -14,7 +15,9 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    let whereClause: any = {}
+    let whereClause: any = {
+      isAprovado: true // Apenas avaliações aprovadas
+    }
 
     if (atracaoId) {
       whereClause.atracaoId = atracaoId
@@ -114,12 +117,38 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Moderar comentário se existir
+    let comentarioModerado = validatedData.comentario
+    let isModerado = false
+    let isAprovado = true
+    
+    if (validatedData.comentario) {
+      const moderationResult = fullModeration(validatedData.comentario)
+      comentarioModerado = moderationResult.censoredText
+      isModerado = !moderationResult.isApproved
+      isAprovado = moderationResult.isApproved
+      
+      // Se não foi aprovado, retornar erro com detalhes
+      if (!isAprovado) {
+        return NextResponse.json(
+          { 
+            error: 'Comentário não aprovado pela moderação',
+            reason: moderationResult.reason,
+            moderatedText: comentarioModerado
+          },
+          { status: 400 }
+        )
+      }
+    }
+
     // Criar avaliação
     const avaliacao = await prisma.avaliacao.create({
       data: {
         nota: validatedData.nota,
-        comentario: validatedData.comentario,
+        comentario: comentarioModerado,
         dataVisita: validatedData.dataVisita,
+        isModerado: isModerado,
+        isAprovado: isAprovado,
         usuarioId: session.user.id,
         atracaoId: validatedData.atracaoId,
         roteiroId: validatedData.roteiroId

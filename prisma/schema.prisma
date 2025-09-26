@@ -110,6 +110,11 @@ model User {
   seguindo                Follow[]      @relation("Seguido")
   consultoriasSolicitadas Consultoria[] @relation("ClienteConsultoria")
   consultoriasAtendidas   Consultoria[] @relation("ConsultorConsultoria")
+  favoritos               Favorito[]
+  templatesRoteiro        TemplateRoteiro[]
+  votosAvaliacao          VotoAvaliacao[]
+  cliquesAfiliado         CliqueAfiliado[]
+  syncJobs                SyncJob[]
 
   @@map("users")
 }
@@ -138,6 +143,9 @@ model Roteiro {
   categoria     Categoria
   orcamento     Decimal?
   visualizacoes Int       @default(0)
+  custoEstimado Decimal?
+  duracaoEstimada Int?    // em minutos
+  templateSourceId String? // ID do template usado
   usuarioId     String
   criadoEm      DateTime  @default(now())
   atualizadoEm  DateTime  @updatedAt
@@ -148,6 +156,7 @@ model Roteiro {
   avaliacoes  Avaliacao[]
   comentarios Comentario[]
   ingressos   Ingresso[]
+  cliquesAfiliado CliqueAfiliado[]
 
   @@map("roteiros")
 }
@@ -219,6 +228,8 @@ model Avaliacao {
   dataVisita   DateTime?
   util         Int       @default(0)
   naoUtil      Int       @default(0)
+  isModerado   Boolean   @default(false)
+  isAprovado   Boolean   @default(true)
   usuarioId    String
   atracaoId    String?
   roteiroId    String?
@@ -229,6 +240,7 @@ model Avaliacao {
   usuario User     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   atracao Atracao? @relation(fields: [atracaoId], references: [id], onDelete: Cascade)
   roteiro Roteiro? @relation(fields: [roteiroId], references: [id], onDelete: Cascade)
+  votos   VotoAvaliacao[]
 
   @@map("avaliacoes")
 }
@@ -293,4 +305,90 @@ model Consultoria {
   consultor User? @relation("ConsultorConsultoria", fields: [consultorId], references: [id], onDelete: SetNull)
 
   @@map("consultorias")
+}
+
+model Favorito {
+  id        String   @id @default(cuid())
+  usuarioId String
+  targetType String  // ITINERARY, PLACE
+  targetId  String
+  criadoEm  DateTime @default(now())
+
+  // Relationships
+  usuario User @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, targetType, targetId])
+  @@map("favoritos")
+}
+
+model TemplateRoteiro {
+  id            String    @id @default(cuid())
+  titulo        String
+  descricao     String?
+  destino       String
+  categoria     Categoria
+  duracaoDias   Int
+  custoEstimado Decimal?
+  moeda         String    @default("BRL")
+  isPublico     Boolean   @default(false)
+  autorId       String
+  criadoEm      DateTime  @default(now())
+  atualizadoEm  DateTime  @updatedAt
+
+  // Relationships
+  autor User @relation(fields: [autorId], references: [id], onDelete: Cascade)
+
+  @@map("templates_roteiro")
+}
+
+model VotoAvaliacao {
+  id         String   @id @default(cuid())
+  avaliacaoId String
+  usuarioId  String
+  isUtil     Boolean
+  criadoEm   DateTime @default(now())
+
+  // Relationships
+  avaliacao Avaliacao @relation(fields: [avaliacaoId], references: [id], onDelete: Cascade)
+  usuario   User      @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([avaliacaoId, usuarioId])
+  @@map("votos_avaliacao")
+}
+
+model CliqueAfiliado {
+  id           String   @id @default(cuid())
+  usuarioId    String?
+  provider     String   // CIVITATIS, GETYOURGUIDE, etc.
+  productRef   String
+  roteiroId    String?
+  itemId       String?
+  utmSource    String?
+  utmMedium    String?
+  utmCampaign  String?
+  ipHash       String
+  userAgentHash String
+  criadoEm     DateTime @default(now())
+
+  // Relationships
+  usuario User?    @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  roteiro Roteiro? @relation(fields: [roteiroId], references: [id], onDelete: SetNull)
+
+  @@map("cliques_afiliado")
+}
+
+model SyncJob {
+  id        String   @id @default(cuid())
+  usuarioId String
+  type      String   // EXPORT, IMPORT
+  status    String   // PENDING, PROCESSING, COMPLETED, FAILED
+  payload   Json?
+  result    Json?
+  criadoEm  DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  // Relationships
+  usuario User @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("sync_jobs")
 }

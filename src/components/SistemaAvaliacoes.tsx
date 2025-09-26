@@ -2,22 +2,21 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Star, ThumbsUp, ThumbsDown, Filter, SortAsc, SortDesc } from 'lucide-react'
+import { Star, Filter, SortAsc, SortDesc } from 'lucide-react'
 import { useSession } from 'next-auth/react'
+import VotoAvaliacao from './VotoAvaliacao'
 
 interface Avaliacao {
   id: string
   nota: number
   comentario: string
   criadoEm: string
+  util: number
+  naoUtil: number
   usuario: {
     name: string
     image?: string
   }
-  likes: number
-  dislikes: number
-  userLiked?: boolean
-  userDisliked?: boolean
 }
 
 interface SistemaAvaliacoesProps {
@@ -63,7 +62,7 @@ export default function SistemaAvaliacoes({
       const response = await fetch(`/api/avaliacoes?${params}`)
       if (response.ok) {
         const data = await response.json()
-        setAvaliacoes(data)
+        setAvaliacoes(data.avaliacoes || data)
       }
     } catch (error) {
       console.error('Error fetching avaliacoes:', error)
@@ -89,34 +88,10 @@ export default function SistemaAvaliacoes({
     }
   }
 
-  const handleLike = async (avaliacaoId: string) => {
-    if (!session) return
-
-    try {
-      const response = await fetch(`/api/avaliacoes/${avaliacaoId}/like`, {
-        method: 'POST'
-      })
-      if (response.ok) {
-        fetchAvaliacoes()
-      }
-    } catch (error) {
-      console.error('Error liking avaliacao:', error)
-    }
-  }
-
-  const handleDislike = async (avaliacaoId: string) => {
-    if (!session) return
-
-    try {
-      const response = await fetch(`/api/avaliacoes/${avaliacaoId}/dislike`, {
-        method: 'POST'
-      })
-      if (response.ok) {
-        fetchAvaliacoes()
-      }
-    } catch (error) {
-      console.error('Error disliking avaliacao:', error)
-    }
+  const handleVoteChange = (util: number, naoUtil: number) => {
+    // Atualizar a lista local de avaliações se necessário
+    // Isso pode ser otimizado para atualizar apenas a avaliação específica
+    fetchAvaliacoes()
   }
 
   const averageRating = avaliacoes.length > 0 
@@ -359,30 +334,13 @@ export default function SistemaAvaliacoes({
                     <p className="text-gray-700 mb-3">{avaliacao.comentario}</p>
                   )}
                   
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={() => handleLike(avaliacao.id)}
-                      className={`flex items-center gap-1 text-sm ${
-                        avaliacao.userLiked 
-                          ? 'text-blue-600' 
-                          : 'text-gray-500 hover:text-blue-600'
-                      }`}
-                    >
-                      <ThumbsUp className="w-4 h-4" />
-                      {avaliacao.likes}
-                    </button>
-                    <button
-                      onClick={() => handleDislike(avaliacao.id)}
-                      className={`flex items-center gap-1 text-sm ${
-                        avaliacao.userDisliked 
-                          ? 'text-red-600' 
-                          : 'text-gray-500 hover:text-red-600'
-                      }`}
-                    >
-                      <ThumbsDown className="w-4 h-4" />
-                      {avaliacao.dislikes}
-                    </button>
-                  </div>
+                  <VotoAvaliacao
+                    avaliacaoId={avaliacao.id}
+                    utilCount={avaliacao.util}
+                    naoUtilCount={avaliacao.naoUtil}
+                    onVoteChange={handleVoteChange}
+                    size="sm"
+                  />
                 </div>
               </div>
             </motion.div>

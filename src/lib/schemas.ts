@@ -214,6 +214,47 @@ export const searchRoteiroSchema = z.object({
   limit: z.number().min(1).max(100).default(20)
 })
 
+// Favoritos Schemas
+export const createFavoritoSchema = z.object({
+  targetType: z.enum(['ITINERARY', 'PLACE']),
+  targetId: z.string().cuid('ID inválido')
+})
+
+// Templates Schemas
+export const createTemplateRoteiroSchema = z.object({
+  titulo: z.string().min(3, 'Título deve ter pelo menos 3 caracteres').max(100),
+  descricao: z.string().max(500, 'Descrição deve ter no máximo 500 caracteres').optional(),
+  destino: z.string().min(2, 'Destino deve ter pelo menos 2 caracteres'),
+  categoria: CategoriaSchema,
+  duracaoDias: z.number().min(1, 'Duração deve ser pelo menos 1 dia').max(30, 'Duração máxima de 30 dias'),
+  custoEstimado: z.number().positive('Custo deve ser positivo').optional(),
+  moeda: z.string().length(3, 'Moeda deve ter 3 caracteres').default('BRL'),
+  isPublico: z.boolean().default(false)
+})
+
+// Votação Schemas
+export const createVotoAvaliacaoSchema = z.object({
+  avaliacaoId: z.string().cuid('ID da avaliação inválido'),
+  isUtil: z.boolean()
+})
+
+// Afiliados Schemas
+export const trackAfiliadoSchema = z.object({
+  provider: z.string().min(1, 'Provider é obrigatório'),
+  productRef: z.string().min(1, 'ProductRef é obrigatório'),
+  roteiroId: z.string().cuid().optional(),
+  itemId: z.string().cuid().optional(),
+  utmSource: z.string().optional(),
+  utmMedium: z.string().optional(),
+  utmCampaign: z.string().optional()
+})
+
+// Sync Schemas
+export const createSyncJobSchema = z.object({
+  type: z.enum(['EXPORT', 'IMPORT']),
+  payload: z.any().optional()
+})
+
 // Legacy schemas for compatibility
 export const avaliacaoSchema = createAvaliacaoSchema
 export const ingressoSchema = createIngressoSchema
@@ -240,6 +281,13 @@ export type CreateConsultoria = z.infer<typeof createConsultoriaSchema>
 export type UpdateConsultoria = z.infer<typeof updateConsultoriaSchema>
 export type SearchAtracao = z.infer<typeof searchAtracaoSchema>
 export type SearchRoteiro = z.infer<typeof searchRoteiroSchema>
+
+// New types
+export type CreateFavorito = z.infer<typeof createFavoritoSchema>
+export type CreateTemplateRoteiro = z.infer<typeof createTemplateRoteiroSchema>
+export type CreateVotoAvaliacao = z.infer<typeof createVotoAvaliacaoSchema>
+export type TrackAfiliado = z.infer<typeof trackAfiliadoSchema>
+export type CreateSyncJob = z.infer<typeof createSyncJobSchema>
 
 // Legacy types for compatibility
 export type CreateRoteiroInput = z.infer<typeof createRoteiroSchema>
